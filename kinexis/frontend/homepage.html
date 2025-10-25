@@ -1,13 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  s
   <meta charset="UTF-8">
   <title>Kinexis</title>
+  <link rel="stylesheet" href="styles.css">
+
+ <style>
+  body.homepage {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* full viewport height */
+  }
+
+  main {
+    flex: 1; /* takes remaining space between navbar and button */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* start slightly lower */
+    align-items: center;
+    text-align: center;
+    padding-top: 100px; /* moves title/tagline down a bit */
+  }
+
+  .btn-container {
+    display: flex;
+    justify-content: center;
+    padding-bottom: 40px; /* space from bottom of viewport */
+  }
+
+  .btn {
+    background-color: #AA2513;
+    color: #D2A10C;
+    font-family: Arial, sans-serif;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    transition: 0.3s;
+  }
+
+  .btn:hover {
+    background-color: #D2A10C;
+    color: #AA2513;
+    cursor: pointer;
+  }
+</style>
+
 </head>
-<body>
+<body class="homepage">
   <nav>
-    <div class="logo">Kinexis</div>
+    <div class="logo">
+      <img src="../images/LogoWave.png" alt="Kinexis Logo" class="nav-logo">
+    </div>
     <ul>
       <li><a href="homepage.html">Home</a></li>
       <li><a href="instructions.html">Instructions</a></li>
@@ -16,9 +59,13 @@
   </nav>
 
   <main>
-    <h1>Welcome to Kinexis!</h1>
+    <h1>Welcome to <span style="color: #AA2513;">Kinexis!</span></h1>
     <p>Your privacy-first motion tracker.</p>
-    <a href="webcam.html" class="btn">Start Session</a>
   </main>
+  
+  <div class="btn-container">
+    <a href="webcam.html" class="btn">Start Session</a>
+  </div>
+
 </body>
 </html>

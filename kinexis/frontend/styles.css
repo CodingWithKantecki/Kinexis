@@ -1,20 +1,38 @@
 /* styles.css */
-body { 
-  font-family: Arial, sans-serif; 
-  margin: 0; 
-  padding: 0; 
-}s
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to bottom, #959aa2, #475B63);
+  min-height: 100vh; /* ensures it fills the whole screen height */
+  color: #272932;
+}
+
+body.homepage {
+  background: 
+    linear-gradient(to bottom, rgba(217, 196, 168, 0.7), rgba(71, 91, 99, 0.3)),
+    url("../images/BGimage.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
 
 nav { 
- background-color: #171719; /* solid dark brown */
+ background-color: #272932; /* solid dark brown */
   display: flex;
-  justify-content: space-around; /* tabs on the right */
+  justify-content: space-between; /* logo left, tabs right */
   align-items: center;
-  padding: 20px 0px;        /* adjust height and spacing */
+  padding: 5px 40px;        /* adjust height and spacing */
   position: sticky;          /* keeps navbar at top while scrolling */
   top: 0;
   z-index: 10;               /* stays above content */
   width: 100%;
+  box-sizing: border-box; /* ensures padding counts inside width */
+  overflow-x: hidden; /* prevents hanging off edges */
+}
+
+.nav-logo {
+  height: 50px;        /* adjust as needed */
+  width: auto;          /* maintains aspect ratio */
 }
 
 nav ul { 
@@ -45,21 +63,18 @@ main {
   margin-top: 100px; 
 }
 
-body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(to bottom, #D9C4A8, #475B63);
-  min-height: 100vh; /* ensures it fills the whole screen height */
-}
-
 .btn { 
-  background: #007bff; 
-  color: white; 
+  color: #AA2513;            /* button text */
   padding: 10px 20px; 
   border-radius: 5px; 
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 18px;
   text-decoration: none; 
+  transition: background-color 0.3s ease, color 0.3s ease; /* smooth hover */
 }
 
 .btn:hover {
-  background: #0056b3;
+  background-color: #AA2513;
+  color: #D2A10C;
 }
