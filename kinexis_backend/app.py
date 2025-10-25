@@ -495,4 +495,6 @@ if __name__ == '__main__':
     print(f"WebSocket available on ws://localhost:{port}")
     print("=" * 50)
 
-    socketio.run(app, debug=True, host='0.0.0.0', port=port, allow_unsafe_werkzeug=True)
+    # Use debug mode only in development
+    is_production = os.environ.get('FLASK_ENV') == 'production'
+    socketio.run(app, debug=not is_production, host='0.0.0.0', port=port, allow_unsafe_werkzeug=True)

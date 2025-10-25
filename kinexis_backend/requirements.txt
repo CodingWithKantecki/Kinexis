@@ -8,7 +8,7 @@ eventlet==0.33.3
 
 # MediaPipe for pose detection
 mediapipe
-opencv-python==4.8.1.78
+opencv-python-headless==4.8.1.78
 numpy==1.24.3
 
 # Database
