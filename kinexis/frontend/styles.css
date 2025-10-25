@@ -3,14 +3,18 @@ body {
   font-family: Arial, sans-serif; 
   margin: 0; 
   padding: 0; 
-}
+}s
 
 nav { 
-  background: #333; 
-  color: #fff; 
-  padding: 1em; 
-  display: flex; 
-  justify-content: space-between; 
+ background-color: #171719; /* solid dark brown */
+  display: flex;
+  justify-content: space-around; /* tabs on the right */
+  align-items: center;
+  padding: 20px 0px;        /* adjust height and spacing */
+  position: sticky;          /* keeps navbar at top while scrolling */
+  top: 0;
+  z-index: 10;               /* stays above content */
+  width: 100%;
 }
 
 nav ul { 
@@ -21,13 +25,31 @@ nav ul {
 }
 
 nav a { 
-  color: white; 
-  text-decoration: none; 
+  color: #AA2513; /* <-- your tab text color */
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 18px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}  
+
+/* Hover effect (optional but nice) */
+nav a:hover {
+  background-color: #AA2513;
+  color: #D2A10C; /* makes text white on hover */
 }
 
 main { 
   text-align: center; 
   margin-top: 100px; 
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to bottom, #D9C4A8, #475B63);
+  min-height: 100vh; /* ensures it fills the whole screen height */
 }
 
 .btn { 
