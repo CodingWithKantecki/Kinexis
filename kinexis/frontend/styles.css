@@ -73,6 +73,20 @@ nav a:hover {
   background-color: #AA2513;
   color: #D2A10C; /* makes text white on hover */
 }
+/* Flex container for logo + name */
+.logo-container {
+  display: flex;
+  align-items: center;       /* vertically center logo and text */
+  gap: 10px;                 /* space between logo and text */
+}
+
+.company-name {
+  font-family: "Bitcount Grid Single", system-ui;
+  font-weight: 900;
+  font-size: 24px;
+  color: #AA2513;
+  line-height: 1;          /* ensures vertical centering */
+}
 
 main { 
   text-align: center; 
@@ -94,3 +108,5 @@ main {
   background-color: #AA2513;
   color: #D2A10C;
 }
+
+

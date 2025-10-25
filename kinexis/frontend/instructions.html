@@ -1,16 +1,71 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <title>Kinexis - Instructions</title>
   <link rel="stylesheet" href="styles.css">
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitcount+Grid+Single:wght@400&display=swap" rel="stylesheet">
+
+<style>
+  main {
+    display: flex;
+    align-items: flex-start;   /* align top of image and text */
+    margin-left: 0%;        
+    margin-right: 10%;
+    margin-top: 50px;
+    gap: 20px;                 /* space between image and text */
+  }
+
+  main h1 {
+    text-align: left;       /* heading aligned with text */
+    margin-bottom: 20px;
+  }
+
+  .instructions-text {
+    text-align: left;
+    max-width: 600px;          /* optional: limits text width */
+  }
+
+  .instructions-text p {
+    margin-bottom: 45px; /* increase spacing between steps */
+  }
+    
+  main p {
+    margin-bottom: 20px;    /* spacing between instructions */
+  }
+
+  main img {
+    max-width: 500px;          /* adjust as needed */
+    height: auto;
+    object-fit: contain;       /* keeps image proportions */
+  }
+
+  .logo-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .company-name {
+    font-family: "Bitcount Grid Single", system-ui;
+    font-weight: 900;
+    font-size: 24px;
+    color: #AA2513;
+  }
+</style>
+
 </head>
+
 <body>
 
   <nav>
-    <div class="logo">
+    <div class="logo-container">
       <img src="../images/LogoWave.png" alt="Kinexis Logo" class="nav-logo">
+      <span class="company-name">Kinexis</span>
     </div>
     <ul>
       <li><a href="homepage.html">Home</a></li>
@@ -20,10 +75,15 @@
   </nav>
 
   <main>
+  <img src="../images/MascotWave.png" alt="Kinexis Mascot">
+  <div class="instructions-text">
     <h1>Instructions</h1>
-    <p>Step 1: Stand in front of your camera.</p>
-    <p>Step 2: Follow the mascot’s guidance.</p>
-    <p>Step 3: End session to download your report.</p>
+    <p><strong>Step 1: Get Ready:</strong> Stand comfortably in front of your camera. Make sure you have enough space to move safely and that there are no tripping hazards nearby!</p>
+    <p><strong>Step 2: Follow Me!</strong>  I will guide you through each movement step by step. Move slowly and carefully, just like I show you. Take your time and have fun tracking your progress!</p>
+    <p><strong>Step 3: All Done?</strong> When you have completed all the movements, end the session to generate your professional, anonymized PDF report. You can share it with your clinic or insurance if needed.</p>
+    <p><strong>Stay Safe:</strong> Remember, this tool is meant to be used under the supervision of a medical professional. Stop immediately if you feel pain, dizziness, or discomfort. This is not a replacement for medical advice; it is just a way to measure and track your progress.</p>
+  </div>
   </main>
+
 </body>
 </html>
