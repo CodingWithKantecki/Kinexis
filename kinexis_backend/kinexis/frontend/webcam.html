@@ -10,7 +10,7 @@
 <body>
   <nav>
     <div class="logo">
-      <img src="../images/LogoWave.png" alt="Kinexis Logo" class="nav-logo">
+      <img src="images/LogoWave.png" alt="Kinexis Logo" class="nav-logo">
     </div>
     <ul>
       <li><a href="homepage.html">Home</a></li>
@@ -20,13 +20,14 @@
   </nav>
 
   <main>
-    <h2>Webcam Session</h2>
-    <video id="webcam" autoplay playsinline width="640" height="480"></video>
-    <canvas id="overlay" width="640" height="480"></canvas>
-    <br>
-    <button id="endSession">End Session</button>
+    <h2>Redirecting to PT Session...</h2>
+    <p>You will be redirected to the PT exercise session in a moment.</p>
+    <p>If you are not redirected, <a href="http://localhost:5001/demo">click here</a>.</p>
   </main>
 
-  <script src="script.js"></script>
+  <script>
+    // Redirect to backend PT demo
+    window.location.href = 'http://localhost:5001/demo';
+  </script>
 </body>
 </html>

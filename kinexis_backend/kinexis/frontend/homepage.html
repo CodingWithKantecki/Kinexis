@@ -2,82 +2,664 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Kinexis</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kinexis - Modern PT Recovery</title>
   <link rel="stylesheet" href="styles.css">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bitcount+Grid+Single:wght@400&display=swap" rel="stylesheet">
+  <!-- Matching Backend Design System -->
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
- <style>
-  body.homepage {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh; /* full viewport height */
-  }
+    body.homepage {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+      background: linear-gradient(180deg, #f5f7fa 0%, #e1e5ea 100%);
+      min-height: 100vh;
+      color: #2d3748;
+      overflow-x: hidden;
+      position: relative;
+    }
 
-  main {
-    flex: 1; /* takes remaining space between navbar and button */
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start; /* start slightly lower */
-    align-items: center;
-    text-align: center;
-    padding-top: 100px; /* moves title/tagline down a bit */
-  }
+    /* Technical pattern background matching backend */
+    .tech-pattern {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      pointer-events: none;
+    }
 
-main h1 {
-  margin-bottom: 10px; /* small space below the title */
-}
+    /* Grid nodes - connection points */
+    .node-grid {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+    }
 
-main p {
-  margin-top: 0;       /* remove default top margin */
-  font-size: 18px;
-}
-  .btn-container {
-    display: flex;
-    justify-content: center;
-    padding-bottom: 40px; /* space from bottom of viewport */
-  }
+    .node {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: #D2A10C;
+      border-radius: 50%;
+      opacity: 0.3;
+    }
 
-  .btn {
-    background-color: #AA2513;
-    color: #D2A10C;
-    font-family: Arial, sans-serif;
-    padding: 10px 20px;
-    border-radius: 5px;
-    text-decoration: none;
-    transition: 0.3s;
-  }
+    .node::after {
+      content: '';
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border: 1px solid #D2A10C;
+      border-radius: 50%;
+      top: -3px;
+      left: -3px;
+      opacity: 0;
+      animation: nodePulse 3s ease-in-out infinite;
+    }
 
-  .btn:hover {
-    background-color: #D2A10C;
-    color: #AA2513;
-    cursor: pointer;
-  }
-</style>
+    @keyframes nodePulse {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0;
+      }
+      50% {
+        transform: scale(2);
+        opacity: 0.5;
+      }
+    }
 
+    /* Grid lines matching backend */
+    .grid-lines {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      opacity: 0.05;
+    }
+
+    .grid-line {
+      position: absolute;
+      background: #D2A10C;
+    }
+
+    .grid-line.horizontal {
+      width: 100%;
+      height: 1px;
+      left: 0;
+    }
+
+    .grid-line.vertical {
+      width: 1px;
+      height: 100%;
+      top: 0;
+    }
+
+    /* Navigation */
+    nav {
+      position: relative;
+      z-index: 10;
+      padding: 24px 48px;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(210, 161, 12, 0.2);
+    }
+
+    nav .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-logo {
+      height: 40px;
+      width: auto;
+    }
+
+    nav ul {
+      display: flex;
+      gap: 40px;
+      list-style: none;
+    }
+
+    nav a {
+      color: #2d3748;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 15px;
+      letter-spacing: 0.5px;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    nav a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #AA2513;
+      transition: width 0.3s ease;
+    }
+
+    nav a:hover {
+      color: #AA2513;
+    }
+
+    nav a:hover::after {
+      width: 100%;
+    }
+
+    /* Hero Section */
+    .hero {
+      position: relative;
+      z-index: 5;
+      min-height: calc(100vh - 89px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 48px;
+    }
+
+    .hero-content {
+      max-width: 900px;
+      text-align: center;
+      animation: fadeInUp 0.8s ease-out;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .hero-badge {
+      display: inline-block;
+      padding: 8px 20px;
+      background: rgba(210, 161, 12, 0.1);
+      border: 1px solid rgba(210, 161, 12, 0.3);
+      border-radius: 30px;
+      color: #D2A10C;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+      animation: glow 2s ease-in-out infinite;
+    }
+
+    @keyframes glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(210, 161, 12, 0.2); }
+      50% { box-shadow: 0 0 30px rgba(210, 161, 12, 0.4); }
+    }
+
+    h1 {
+      font-size: 72px;
+      font-weight: 200;
+      letter-spacing: 4px;
+      line-height: 1.1;
+      margin-bottom: 24px;
+      color: #2d3748;
+    }
+
+    .brand-highlight {
+      background: linear-gradient(90deg, #D2A10C 0%, #AA2513 50%, #D2A10C 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      font-weight: 600;
+      display: inline-block;
+      background-size: 200% 100%;
+      animation: gradientShift 3s ease infinite;
+    }
+
+    .hero-description {
+      font-size: 20px;
+      line-height: 1.6;
+      color: #718096;
+      margin-bottom: 48px;
+      font-weight: 400;
+    }
+
+    /* CTA Buttons matching backend colors */
+    .cta-container {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .cta-primary {
+      display: inline-block;
+      padding: 18px 48px;
+      background: linear-gradient(135deg, #D2A10C 0%, #F59E0B 100%);
+      color: white;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      border-radius: 12px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(210, 161, 12, 0.3);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .cta-primary::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .cta-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(210, 161, 12, 0.5);
+      background: linear-gradient(135deg, #F59E0B 0%, #AA2513 100%);
+    }
+
+    .cta-primary:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .cta-secondary {
+      display: inline-block;
+      padding: 18px 48px;
+      background: transparent;
+      color: #718096;
+      font-size: 16px;
+      font-weight: 600;
+      text-decoration: none;
+      border: 2px solid rgba(170, 37, 19, 0.3);
+      border-radius: 12px;
+      transition: all 0.3s ease;
+    }
+
+    .cta-secondary:hover {
+      background: rgba(170, 37, 19, 0.05);
+      border-color: #AA2513;
+      color: #AA2513;
+    }
+
+    /* Feature Pills */
+    .features {
+      margin-top: 60px;
+      display: flex;
+      gap: 24px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .feature-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(210, 161, 12, 0.2);
+      border-radius: 30px;
+      color: #4a5568;
+      font-size: 14px;
+    }
+
+    .feature-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #D2A10C 0%, #F59E0B 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      color: white;
+      font-size: 12px;
+    }
+
+    /* Animated Mascots */
+    .mascot {
+      position: fixed;
+      width: 200px;
+      height: 200px;
+      z-index: 3; /* Behind main content */
+      pointer-events: none;
+    }
+
+    .mascot-frame {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.15));
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .mascot-frame.active {
+      opacity: 1;
+    }
+
+    /* Mascot 1 - Lower left area, not corner */
+    .mascot-1 {
+      bottom: 100px;
+      left: 80px;
+      animation: gentleFloat 4s ease-in-out infinite;
+    }
+
+    /* Mascot 2 - Right side, middle-ish */
+    .mascot-2 {
+      top: 35%;
+      right: 120px;
+      animation: gentleSway 4.5s ease-in-out infinite 0.5s;
+    }
+
+    /* Mascot 3 - Upper left-center area */
+    .mascot-3 {
+      top: 160px;
+      left: 25%;
+      animation: gentleFloat 5s ease-in-out infinite 1s;
+    }
+
+    /* Mascot 5 - Bottom right area, higher up */
+    .mascot-5 {
+      bottom: 180px;
+      right: 60px;
+      animation: gentleSway 4.2s ease-in-out infinite 1.5s;
+    }
+
+    @keyframes gentleFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+
+    @keyframes gentleSway {
+      0%, 100% { transform: translateX(0px) rotate(0deg); }
+      25% { transform: translateX(-5px) rotate(-2deg); }
+      75% { transform: translateX(5px) rotate(2deg); }
+    }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      nav {
+        padding: 20px 24px;
+      }
+
+      nav ul {
+        display: none;
+      }
+
+      /* Hide mascots on mobile to avoid cluttering */
+      .mascot {
+        display: none;
+      }
+
+      .hero {
+        padding: 40px 24px;
+      }
+
+      h1 {
+        font-size: 48px;
+      }
+
+      .hero-description {
+        font-size: 18px;
+      }
+
+      .cta-container {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .cta-primary, .cta-secondary {
+        width: 100%;
+        text-align: center;
+      }
+
+      .mascot {
+        width: 100px;
+        height: 100px;
+      }
+    }
+
+    /* Angle measurements floating */
+    .calc-numbers {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .calc-num {
+      position: absolute;
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      color: #AA2513;
+      opacity: 0;
+      animation: calcFade 5s ease-in-out infinite;
+    }
+
+    @keyframes calcFade {
+      0%, 100% {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+      20%, 80% {
+        opacity: 0.4;
+        transform: translateY(0);
+      }
+    }
+  </style>
 </head>
 <body class="homepage">
-  <nav>
-    <div class="logo">
-      <img src="../images/LogoWave.png" alt="Kinexis Logo" class="nav-logo">
+  <!-- Technical pattern background matching backend -->
+  <div class="tech-pattern">
+    <!-- Grid lines -->
+    <div class="grid-lines">
+      <div class="grid-line horizontal" style="top: 10%;"></div>
+      <div class="grid-line horizontal" style="top: 20%;"></div>
+      <div class="grid-line horizontal" style="top: 30%;"></div>
+      <div class="grid-line horizontal" style="top: 40%;"></div>
+      <div class="grid-line horizontal" style="top: 50%;"></div>
+      <div class="grid-line horizontal" style="top: 60%;"></div>
+      <div class="grid-line horizontal" style="top: 70%;"></div>
+      <div class="grid-line horizontal" style="top: 80%;"></div>
+      <div class="grid-line horizontal" style="top: 90%;"></div>
+      <div class="grid-line vertical" style="left: 10%;"></div>
+      <div class="grid-line vertical" style="left: 20%;"></div>
+      <div class="grid-line vertical" style="left: 30%;"></div>
+      <div class="grid-line vertical" style="left: 40%;"></div>
+      <div class="grid-line vertical" style="left: 50%;"></div>
+      <div class="grid-line vertical" style="left: 60%;"></div>
+      <div class="grid-line vertical" style="left: 70%;"></div>
+      <div class="grid-line vertical" style="left: 80%;"></div>
+      <div class="grid-line vertical" style="left: 90%;"></div>
     </div>
-    <ul>
-      <li><a href="homepage.html">Home</a></li>
-      <li><a href="instructions.html">Instructions</a></li>
-      <li><a href="goals.html">Our Mission</a></li>
-    </ul>
-  </nav>
 
-  <main>
-    <h1 class="bitcount-title">Welcome to <span style="color: #AA2513;">Kinexis!</span></h1>
-    <p>Objective PT Recovery. Fast. Accurate. Affordable.</p>
-  </main>
-  
-  <div class="btn-container">
-    <a href="webcam.html" class="btn">Start Session</a>
+    <!-- Grid nodes -->
+    <div class="node-grid">
+      <div class="node" style="top: 15%; left: 20%; animation-delay: 0s;"></div>
+      <div class="node" style="top: 15%; left: 50%; animation-delay: 0.5s;"></div>
+      <div class="node" style="top: 15%; left: 80%; animation-delay: 1s;"></div>
+      <div class="node" style="top: 35%; left: 10%; animation-delay: 0.3s;"></div>
+      <div class="node" style="top: 35%; left: 35%; animation-delay: 0.8s;"></div>
+      <div class="node" style="top: 35%; left: 65%; animation-delay: 1.3s;"></div>
+      <div class="node" style="top: 35%; left: 90%; animation-delay: 1.8s;"></div>
+      <div class="node" style="top: 55%; left: 25%; animation-delay: 0.6s;"></div>
+      <div class="node" style="top: 55%; left: 50%; animation-delay: 1.1s;"></div>
+      <div class="node" style="top: 55%; left: 75%; animation-delay: 1.6s;"></div>
+      <div class="node" style="top: 75%; left: 15%; animation-delay: 0.9s;"></div>
+      <div class="node" style="top: 75%; left: 40%; animation-delay: 1.4s;"></div>
+      <div class="node" style="top: 75%; left: 60%; animation-delay: 1.9s;"></div>
+      <div class="node" style="top: 75%; left: 85%; animation-delay: 2.4s;"></div>
+    </div>
+
+    <!-- Calculation numbers floating -->
+    <div class="calc-numbers">
+      <div class="calc-num" style="top: 25%; left: 15%; animation-delay: 0s;">θ = 45.2°</div>
+      <div class="calc-num" style="top: 45%; left: 70%; animation-delay: 1s;">∠ = 90.0°</div>
+      <div class="calc-num" style="top: 65%; left: 40%; animation-delay: 2s;">ROM: 120°</div>
+      <div class="calc-num" style="top: 35%; right: 25%; animation-delay: 3s;">Δ = 15.7°</div>
+      <div class="calc-num" style="bottom: 30%; left: 60%; animation-delay: 4s;">α = 67.3°</div>
+    </div>
   </div>
 
+  <!-- Navigation -->
+  <nav>
+    <div class="container">
+      <div class="logo">
+        <img src="images/LogoWave.png" alt="Kinexis" class="nav-logo">
+      </div>
+      <ul>
+        <li><a href="homepage.html">Home</a></li>
+        <li><a href="instructions.html">Instructions</a></li>
+        <li><a href="goals.html">Our Mission</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">AI-Powered PT Recovery</div>
+
+      <h1>
+        Welcome to <span class="brand-highlight">KINEXIS</span>
+      </h1>
+
+      <p class="hero-description">
+        Objective PT Recovery. Fast. Accurate. Affordable.
+      </p>
+
+      <div class="cta-container">
+        <a href="http://localhost:5001/demo" class="cta-primary">Start Session</a>
+        <a href="instructions.html" class="cta-secondary">Learn More</a>
+      </div>
+
+      <div class="features">
+        <div class="feature-pill">
+          <div class="feature-icon">✓</div>
+          <span>Real-time Tracking</span>
+        </div>
+        <div class="feature-pill">
+          <div class="feature-icon">✓</div>
+          <span>Medical Grade Accuracy</span>
+        </div>
+        <div class="feature-pill">
+          <div class="feature-icon">✓</div>
+          <span>Instant Reports</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Animated Mascots with different poses -->
+  <div class="mascot mascot-1" id="mascot1">
+    <img src="images/sit1.png" class="mascot-frame active" alt="Kinexis Frame 1">
+    <img src="images/sit2.png" class="mascot-frame" alt="Kinexis Frame 2">
+    <img src="images/sit3.png" class="mascot-frame" alt="Kinexis Frame 3">
+  </div>
+  <div class="mascot mascot-2" id="mascot2">
+    <img src="images/arm1.png" class="mascot-frame active" alt="Kinexis Frame 1">
+    <img src="images/arm2.png" class="mascot-frame" alt="Kinexis Frame 2">
+    <img src="images/arm3.png" class="mascot-frame" alt="Kinexis Frame 3">
+  </div>
+  <div class="mascot mascot-3" id="mascot3">
+    <img src="images/arm3.png" class="mascot-frame active" alt="Kinexis Frame 1">
+    <img src="images/arm2.png" class="mascot-frame" alt="Kinexis Frame 2">
+    <img src="images/arm1.png" class="mascot-frame" alt="Kinexis Frame 3">
+  </div>
+  <div class="mascot mascot-5" id="mascot4">
+    <img src="images/sit2.png" class="mascot-frame active" alt="Kinexis Frame 1">
+    <img src="images/sit3.png" class="mascot-frame" alt="Kinexis Frame 2">
+    <img src="images/sit1.png" class="mascot-frame" alt="Kinexis Frame 3">
+  </div>
+
+  <!-- Frame Animation Script -->
+  <script>
+    // Frame animation system for mascots
+    class MascotAnimator {
+      constructor(mascotId, frameDelay) {
+        this.mascot = document.getElementById(mascotId);
+        this.frames = this.mascot.querySelectorAll('.mascot-frame');
+        this.currentFrame = 0;
+        this.frameDelay = frameDelay;
+        this.animationInterval = null;
+      }
+
+      start() {
+        this.animationInterval = setInterval(() => {
+          // Hide current frame
+          this.frames[this.currentFrame].classList.remove('active');
+
+          // Move to next frame
+          this.currentFrame = (this.currentFrame + 1) % this.frames.length;
+
+          // Show next frame
+          this.frames[this.currentFrame].classList.add('active');
+        }, this.frameDelay);
+      }
+
+      stop() {
+        if (this.animationInterval) {
+          clearInterval(this.animationInterval);
+          this.animationInterval = null;
+        }
+      }
+    }
+
+    // Start animations when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      // Create animators for each mascot with different speeds
+      const animator1 = new MascotAnimator('mascot1', 600);  // Sitting animation
+      const animator2 = new MascotAnimator('mascot2', 500);  // Arms animation
+      const animator3 = new MascotAnimator('mascot3', 550);  // Reverse arms animation
+      const animator4 = new MascotAnimator('mascot4', 700);  // Sitting variation
+
+      // Start all animations
+      animator1.start();
+      animator2.start();
+      animator3.start();
+      animator4.start();
+    });
+  </script>
 </body>
 </html>
