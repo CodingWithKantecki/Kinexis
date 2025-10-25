@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Kinexis - Our Goals</title>
+  <link rel="stylesheet" href="styles.css">
+
+  <style>
+.team {
+  max-width: 1000px;
+  margin: 50px auto;
+  text-align: center;
+  padding: 0 70px;
+}
+
+.team h2 {
+  font-size: 28px;
+  margin-bottom: 30px;
+}
+
+.team-container {
+  display: flex;
+  justify-content: space-between; /* keeps all 4 members in a row */
+  align-items: flex-start;
+  gap: 20px;                     /* spacing between members */
+  flex-wrap: nowrap;              /* prevents wrapping on desktop */
+}
+
+.team-member {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.team-member img {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%; 
+  object-fit: cover;
+  border: 3px solid #D2A10C; 
+}
+
+.team-member p {
+  margin-top: 10px;
+  font-weight: bold;
+}
+</style>
+
+</head>
+<body>
+  <nav>
+    <div class="logo">
+      <img src="../images/LogoWave.png" alt="Kinexis Logo" class="nav-logo">
+    </div>
+    <ul>
+      <li><a href="homepage.html">Home</a></li>
+      <li><a href="instructions.html">Instructions</a></li>
+      <li><a href="goals.html">Our Mission</a></li>
+    </ul>
+  </nav>
+
+<main>
+  <h1>Our Mission</h1>
+  <p style="
+      max-width: 800px;   /* limits width */
+      margin: 0 auto;     /* centers block horizontally */
+      padding: 0 20px;    /* adds left/right padding */
+      text-align: left;   /* aligns text to the left inside the block */
+      line-height: 1.6;   /* optional: makes paragraphs easier to read */
+  ">
+    At <span style="color: #AA2513;">Kinexis</span>, our mission is to revolutionize physical therapy tracking by providing real-time measurements and professional progress reports in a fast, accurate, and accessible format. Patients can perform exercises at home while clinics monitor progress remotely, generating actionable insights instantly. Our automated demo and PDF reports make rehabilitation data clear, professional, and insurance-ready—without expensive or complex motion tracking systems.
+    </p>
+
+    <!-- Meet Our Team Section -->
+  <section class="team">
+    <h2>Meet Our Team</h2>
+    <div class="team-container">
+      <div class="team-member">
+        <img src="../images/member1.jpg" alt="Team Member 1">
+        <p>Member 1</p>
+      </div>
+      <div class="team-member">
+        <img src="../images/member2.jpg" alt="Team Member 2">
+        <p>Member 2</p>
+      </div>
+      <div class="team-member">
+        <img src="../images/member3.jpg" alt="Team Member 3">
+        <p>Member 3</p>
+      </div>
+      <div class="team-member">
+        <img src="../images/member4.jpg" alt="Team Member 4">
+        <p>Member 4</p>
+      </div>
+    </div>
+  </section>
+
+  </main>
+</body>
+</html>

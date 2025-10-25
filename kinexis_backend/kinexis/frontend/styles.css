@@ -1,0 +1,96 @@
+/* styles.css */
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to bottom, #959aa2, #275286);
+  font-weight: bold;
+  font-size: 18px;
+  min-height: 100vh; /* ensures it fills the whole screen height */
+  color: #272932;
+}
+
+body.homepage {
+  background: 
+    linear-gradient(to bottom, rgba(217, 196, 168, 0.7), rgba(71, 91, 99, 0.3)),
+    url("../images/BGimage.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.bitcount-title {
+  font-family: "Bitcount Grid Single", system-ui;
+  font-weight: 900;          /* bold weight */
+  font-size: 70px; 
+  font-style: normal;
+  font-optical-sizing: auto;
+  font-variation-settings:
+    "slnt" 0,
+    "CRSV" 0.5,
+    "ELSH" 0,
+    "ELXP" 0;
+}
+
+nav { 
+ background-color: #272932; /* solid dark brown */
+  display: flex;
+  justify-content: space-between; /* logo left, tabs right */
+  align-items: center;
+  padding: 5px 40px;        /* adjust height and spacing */
+  position: sticky;          /* keeps navbar at top while scrolling */
+  top: 0;
+  z-index: 10;               /* stays above content */
+  width: 100%;
+  box-sizing: border-box; /* ensures padding counts inside width */
+  overflow-x: hidden; /* prevents hanging off edges */
+}
+
+.nav-logo {
+    width: auto;       /* keep natural width */
+    height: 40px;      /* bigger than before, adjust as needed */
+    max-height: 60px;  /* optional cap to prevent overflow */
+}
+
+nav ul { 
+  list-style: none; 
+  display: flex; 
+  gap: 1em; 
+  margin: 0;
+}
+
+nav a { 
+  color: #AA2513; /* <-- your tab text color */
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 18px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}  
+
+/* Hover effect (optional but nice) */
+nav a:hover {
+  background-color: #AA2513;
+  color: #D2A10C; /* makes text white on hover */
+}
+
+main { 
+  text-align: center; 
+  margin-top: 100px; 
+}
+
+.btn { 
+  color: #AA2513;            /* button text */
+  padding: 10px 20px; 
+  border-radius: 5px; 
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 18px;
+  text-decoration: none; 
+  transition: background-color 0.3s ease, color 0.3s ease; /* smooth hover */
+}
+
+.btn:hover {
+  background-color: #AA2513;
+  color: #D2A10C;
+}

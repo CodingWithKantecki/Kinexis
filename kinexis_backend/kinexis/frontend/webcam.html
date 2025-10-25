@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="styles.css">
+
+  <meta charset="UTF-8">
+  <title>Kinexis Webcam</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav>
+    <div class="logo">
+      <img src="../images/LogoWave.png" alt="Kinexis Logo" class="nav-logo">
+    </div>
+    <ul>
+      <li><a href="homepage.html">Home</a></li>
+      <li><a href="instructions.html">Instructions</a></li>
+      <li><a href="goals.html">Our Mission</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <h2>Webcam Session</h2>
+    <video id="webcam" autoplay playsinline width="640" height="480"></video>
+    <canvas id="overlay" width="640" height="480"></canvas>
+    <br>
+    <button id="endSession">End Session</button>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
