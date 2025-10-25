@@ -1,0 +1,14 @@
+# Ignore all backend Python files
+*.py
+*.pyc
+__pycache__/
+venv_py311/
+.env
+requirements.txt
+Pipfile
+Pipfile.lock
+pytest.ini
+.pytest_cache/
+
+# Include only frontend
+!kinexis/frontend/**
