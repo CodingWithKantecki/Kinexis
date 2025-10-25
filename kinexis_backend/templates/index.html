@@ -1378,18 +1378,18 @@
             transform: translateY(-2px);
         }
 
-        /* Bottom overlay bar - Transparent glassmorphism style */
+        /* Bottom overlay bar - Simplified for just exercise name */
         #bottomOverlay {
             position: fixed !important;
             bottom: 0;
             left: 0;
             right: 0;
-            height: 100px;
+            height: 80px;
             background: linear-gradient(to bottom,
                 rgba(0, 0, 0, 0) 0%,
                 rgba(0, 0, 0, 0.3) 100%);
             display: none;
-            grid-template-columns: 200px 1fr 200px;
+            justify-content: center;
             align-items: center;
             padding: 0 60px;
             color: white;
@@ -1399,8 +1399,7 @@
             z-index: 1000;
             visibility: visible !important;
             will-change: opacity;
-            transform: translateZ(0);
-            -webkit-transform: translateZ(0);
+            /* Remove transform to prevent inversion issues */
         }
 
         #repCounter {
@@ -1471,24 +1470,7 @@
             flex-shrink: 0;
         }
 
-        /* Progress bar - Golden theme style */
-        #progressBar {
-            position: fixed;
-            bottom: 100px;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: rgba(170, 37, 19, 0.2);
-            z-index: 999;
-        }
-
-        #progressFill {
-            height: 100%;
-            background: linear-gradient(90deg, #D2A10C 0%, #AA2513 50%, #D2A10C 100%);
-            width: 0%;
-            transition: width 0.3s ease;
-            box-shadow: 0 0 12px rgba(210, 161, 12, 0.6);
-        }
+        /* Progress bar - Removed as not needed */
 
         @keyframes pulse {
             0%, 100% { transform: scale(1); }
@@ -1725,22 +1707,9 @@
             <div class="countdown-number" id="countdownNumber">3</div>
         </div>
 
-        <!-- Progress bar -->
-        <div id="progressBar">
-            <div id="progressFill"></div>
-        </div>
-
         <!-- Bottom overlay -->
         <div id="bottomOverlay">
-            <div id="repCounter" class="metric-box">
-                <div class="metric-label">REPS</div>
-                <div class="metric-value">0/10</div>
-            </div>
-            <div id="exerciseName">DEMO MODE</div>
-            <div id="angleDisplay" class="metric-box">
-                <div class="metric-label">ANGLE</div>
-                <div class="metric-value">0°/150°</div>
-            </div>
+            <div id="exerciseName">SHOULDER ABDUCTION</div>
         </div>
     </div>
 
@@ -2034,7 +2003,7 @@
                 const exerciseName = document.getElementById('exerciseName');
 
                 // Temporarily show instruction
-                bottomOverlay.style.display = 'grid';
+                bottomOverlay.style.display = 'flex';
                 bottomOverlay.style.opacity = '1';
                 exerciseName.textContent = instructionText.toUpperCase();
 
@@ -2380,7 +2349,7 @@
 
             // Make sure bottom overlay is visible with smooth fade
             const bottomOverlay = document.getElementById('bottomOverlay');
-            bottomOverlay.style.display = 'grid';
+            bottomOverlay.style.display = 'flex';
             bottomOverlay.style.opacity = '0';
 
             // Use requestAnimationFrame for smooth transition
@@ -2560,13 +2529,28 @@
                                 }
 
                                 // Display detailed instruction with formatting
-                                if (instText.includes('RIGHT ARM:')) {
+                                if (instText.includes('LEFT ARM:')) {
                                     instructionDetail.innerHTML = `
-                                        <div class="arm-indicator right">
+                                        <div class="arm-indicator left" style="color: #4ade80;">
+                                            <span>⬅️</span> ${instText}
+                                        </div>
+                                        <div style="margin-top: 8px; font-size: 16px; opacity: 0.8;">
+                                            Current: ${Math.round(angle)}° / Target: 150°
+                                        </div>
+                                    `;
+                                } else if (instText.includes('RIGHT ARM:')) {
+                                    instructionDetail.innerHTML = `
+                                        <div class="arm-indicator right" style="color: #60a5fa;">
                                             <span>➡️</span> ${instText}
                                         </div>
                                         <div style="margin-top: 8px; font-size: 16px; opacity: 0.8;">
                                             Current: ${Math.round(angle)}° / Target: 150°
+                                        </div>
+                                    `;
+                                } else if (instText.includes('BOTH arms')) {
+                                    instructionDetail.innerHTML = `
+                                        <div class="arm-indicator both" style="color: #f59e0b;">
+                                            <span>🙌</span> ${instText}
                                         </div>
                                     `;
                                 } else {
@@ -2639,17 +2623,7 @@
         });
 
         function updateBottomOverlay(reps, currentAngle, progress, targetAngle) {
-            // Update rep counter
-            document.querySelector('#repCounter .metric-value').textContent = `${reps}/10`;
-
-            // Update angle display
-            document.querySelector('#angleDisplay .metric-value').textContent =
-                `${Math.round(currentAngle)}°/${targetAngle}°`;
-
-            // Update progress bar
-            document.getElementById('progressFill').style.width = `${progress}%`;
-
-            // Update exercise name based on current exercise (no more DEMO MODE)
+            // Only update the exercise name now (removed counters)
             const exerciseNames = {
                 'shoulder_abduction': 'SHOULDER ABDUCTION',
                 'knee_flexion': 'KNEE FLEXION',
@@ -2659,8 +2633,6 @@
 
             // Always show the actual exercise name
             document.getElementById('exerciseName').textContent = exerciseNames[currentExercise];
-
-            // Remove pulse effect to prevent layout shifting
         }
 
         // Show assessment report
@@ -2672,41 +2644,124 @@
             // Clear previous content
             metricsContainer.innerHTML = '';
 
-            // Add metrics
-            const metrics = [
-                { label: 'Max Angle', value: `${report.max_angle}°` },
-                { label: 'Range of Motion', value: `${report.range_of_motion}°` },
-                { label: 'Average Angle', value: `${report.average_angle}°` },
-                { label: 'Test Duration', value: `${report.test_duration}s` }
-            ];
+            // Check if this is a dual-arm report (shoulder abduction)
+            if (report.left_arm && report.right_arm) {
+                // Display both arms side by side
+                metricsContainer.style.display = 'grid';
+                metricsContainer.style.gridTemplateColumns = '1fr 1fr';
+                metricsContainer.style.gap = '30px';
 
-            metrics.forEach(metric => {
-                const metricDiv = document.createElement('div');
-                metricDiv.className = 'report-metric';
-                metricDiv.innerHTML = `
-                    <div class="report-metric-label">${metric.label}</div>
-                    <div class="report-metric-value">${metric.value}</div>
+                // LEFT ARM SECTION
+                const leftDiv = document.createElement('div');
+                leftDiv.innerHTML = `
+                    <h3 style="color: #4ade80; margin: 0 0 15px 0; text-align: center;">LEFT ARM</h3>
+                    <div style="background: rgba(74, 222, 128, 0.1); padding: 15px; border-radius: 10px;">
+                        <div style="margin-bottom: 12px;">
+                            <div style="color: #888; font-size: 12px;">Max Angle</div>
+                            <div style="color: white; font-size: 24px; font-weight: bold;">${report.left_arm.max_angle}°</div>
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <div style="color: #888; font-size: 12px;">Range of Motion</div>
+                            <div style="color: white; font-size: 18px;">${report.left_arm.range_of_motion}°</div>
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <div style="color: #888; font-size: 12px;">Test Duration</div>
+                            <div style="color: white; font-size: 16px;">${report.left_arm.test_duration}s</div>
+                        </div>
+                        <div>
+                            <div style="color: #888; font-size: 12px;">Increments Reached</div>
+                            <div style="color: white; font-size: 14px;">${report.left_arm.increments_achieved.map(v => `${v}°`).join(', ') || 'None'}</div>
+                        </div>
+                    </div>
                 `;
-                metricsContainer.appendChild(metricDiv);
-            });
 
-            // Add increments achieved
-            if (report.increments_achieved && report.increments_achieved.length > 0) {
-                const incrementsDiv = document.createElement('div');
-                incrementsDiv.className = 'report-metric';
-                incrementsDiv.style.gridColumn = 'span 2';
-                incrementsDiv.innerHTML = `
-                    <div class="report-metric-label">Increments Achieved</div>
-                    <div class="report-metric-value">${report.increments_achieved.join('°, ')}°</div>
+                // RIGHT ARM SECTION
+                const rightDiv = document.createElement('div');
+                rightDiv.innerHTML = `
+                    <h3 style="color: #60a5fa; margin: 0 0 15px 0; text-align: center;">RIGHT ARM</h3>
+                    <div style="background: rgba(96, 165, 250, 0.1); padding: 15px; border-radius: 10px;">
+                        <div style="margin-bottom: 12px;">
+                            <div style="color: #888; font-size: 12px;">Max Angle</div>
+                            <div style="color: white; font-size: 24px; font-weight: bold;">${report.right_arm.max_angle}°</div>
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <div style="color: #888; font-size: 12px;">Range of Motion</div>
+                            <div style="color: white; font-size: 18px;">${report.right_arm.range_of_motion}°</div>
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <div style="color: #888; font-size: 12px;">Test Duration</div>
+                            <div style="color: white; font-size: 16px;">${report.right_arm.test_duration}s</div>
+                        </div>
+                        <div>
+                            <div style="color: #888; font-size: 12px;">Increments Reached</div>
+                            <div style="color: white; font-size: 14px;">${report.right_arm.increments_achieved.map(v => `${v}°`).join(', ') || 'None'}</div>
+                        </div>
+                    </div>
                 `;
-                metricsContainer.appendChild(incrementsDiv);
+
+                metricsContainer.appendChild(leftDiv);
+                metricsContainer.appendChild(rightDiv);
+
+                // Performance ratings and comparison
+                ratingContainer.innerHTML = `
+                    <div style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 10px; margin-top: 20px;">
+                        <h3 style="margin: 0 0 15px 0; color: #D2A10C; text-align: center;">Performance Summary</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                            <div style="text-align: center;">
+                                <div style="color: #4ade80; font-size: 14px; margin-bottom: 5px;">Left Arm</div>
+                                <div style="color: white; font-size: 14px; line-height: 1.4;">${report.left_arm.performance_rating}</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="color: #60a5fa; font-size: 14px; margin-bottom: 5px;">Right Arm</div>
+                                <div style="color: white; font-size: 14px; line-height: 1.4;">${report.right_arm.performance_rating}</div>
+                            </div>
+                        </div>
+                        <div style="text-align: center; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                            <div style="color: #888; font-size: 12px; margin-bottom: 5px;">Arm Balance</div>
+                            <div style="color: ${report.comparison === 'Balanced' ? '#4ade80' : '#f59e0b'}; font-size: 20px; font-weight: bold;">
+                                ${report.comparison}
+                                ${report.comparison === 'Asymmetric' ? ' ⚠️' : ' ✓'}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                // Original single report display (for other exercises)
+                const metrics = [
+                    { label: 'Max Angle', value: `${report.max_angle}°` },
+                    { label: 'Range of Motion', value: `${report.range_of_motion}°` },
+                    { label: 'Average Angle', value: `${report.average_angle}°` },
+                    { label: 'Test Duration', value: `${report.test_duration}s` }
+                ];
+
+                metrics.forEach(metric => {
+                    const metricDiv = document.createElement('div');
+                    metricDiv.className = 'report-metric';
+                    metricDiv.innerHTML = `
+                        <div class="report-metric-label">${metric.label}</div>
+                        <div class="report-metric-value">${metric.value}</div>
+                    `;
+                    metricsContainer.appendChild(metricDiv);
+                });
+
+                // Add increments achieved
+                if (report.increments_achieved && report.increments_achieved.length > 0) {
+                    const incrementsDiv = document.createElement('div');
+                    incrementsDiv.className = 'report-metric';
+                    incrementsDiv.style.gridColumn = 'span 2';
+                    incrementsDiv.innerHTML = `
+                        <div class="report-metric-label">Increments Achieved</div>
+                        <div class="report-metric-value">${report.increments_achieved.join('°, ')}°</div>
+                    `;
+                    metricsContainer.appendChild(incrementsDiv);
+                }
+
+                // Add performance rating
+                ratingContainer.innerHTML = `
+                    <h3 style="margin: 0 0 10px 0; color: #D2A10C;">Performance Rating</h3>
+                    <p style="margin: 0; font-size: 18px;">${report.performance_rating}</p>
+                `;
             }
-
-            // Add performance rating
-            ratingContainer.innerHTML = `
-                <h3 style="margin: 0 0 10px 0; color: #D2A10C;">Performance Rating</h3>
-                <p style="margin: 0; font-size: 18px;">${report.performance_rating}</p>
-            `;
 
             // Show modal
             reportModal.style.display = 'flex';

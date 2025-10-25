@@ -48,9 +48,10 @@ class PoseDetector:
         self.history_size = 3
         self.min_visibility_threshold = 0.2  # Lower for better detection
 
-        # PT Assessment for shoulder abduction
-        self.assessment_state = 'tracking'
-        self.rom_stats = {
+        # PT Assessment for shoulder abduction - separate arms
+        self.assessment_state = 'waiting'  # waiting → arms_check → left_arm → right_arm → complete
+        self.current_arm = None  # Track which arm we're testing
+        self.left_arm_stats = {
             'max_angle': 0,
             'min_angle': 180,
             'angle_history': [],
@@ -60,6 +61,17 @@ class PoseDetector:
             'test_end_time': None,
             'total_frames': 0
         }
+        self.right_arm_stats = {
+            'max_angle': 0,
+            'min_angle': 180,
+            'angle_history': [],
+            'increment_markers': set(),
+            'start_position_angle': None,
+            'test_start_time': None,
+            'test_end_time': None,
+            'total_frames': 0
+        }
+        self.arms_down_check_frames = 0  # Counter for arms position check
 
         # Calibration state
         self.calibration_success_count = 0
@@ -115,21 +127,24 @@ class PoseDetector:
             return "Needs improvement - Restricted range"
 
     def reset_assessment(self):
-        """Reset assessment state"""
-        self.assessment_state = 'tracking'
-        self.rom_stats = {
-            'max_angle': 0,
-            'min_angle': 180,
-            'angle_history': [],
-            'increment_markers': set(),
-            'start_position_angle': None,
-            'test_start_time': None,
-            'test_end_time': None,
-            'total_frames': 0
-        }
+        """Reset assessment state for separate arm testing"""
+        self.assessment_state = 'arms_check'  # Start with arms position check
+        self.current_arm = None
+        self.arms_down_check_frames = 0
+
+        # Reset both arm stats
+        for stats in [self.left_arm_stats, self.right_arm_stats]:
+            stats['max_angle'] = 0
+            stats['min_angle'] = 180
+            stats['angle_history'] = []
+            stats['increment_markers'] = set()
+            stats['start_position_angle'] = None
+            stats['test_start_time'] = None
+            stats['test_end_time'] = None
+            stats['total_frames'] = 0
 
     def detect_shoulder_abduction(self, landmarks) -> Dict:
-        """Detect shoulder abduction with crash protection"""
+        """Detect shoulder abduction with separate arm assessment"""
         try:
             if not landmarks:
                 return {'error': 'No landmarks detected'}
@@ -178,73 +193,174 @@ class PoseDetector:
                 left_angle_raw = self.calculate_angle(left_hip, left_shoulder, left_elbow)
                 left_angle = self.smooth_angle('shoulder_abduction', 'left', left_angle_raw)
 
-            # Determine active side
-            active_side = "right" if right_angle > left_angle else "left"
-            active_angle = max(right_angle, left_angle)
-
-            # PT Assessment tracking
+            # State machine for separate arm assessment
             instruction = ""
             increment_reached = None
+            active_angle = 0
+            active_side = None
+            report = None
 
-            if self.assessment_state == 'tracking':
-                self.rom_stats['total_frames'] += 1
-                self.rom_stats['angle_history'].append(active_angle)
+            # ARMS CHECK STATE - Verify both arms are at sides
+            if self.assessment_state == 'arms_check':
+                # Check if both arms are down (< 30 degrees)
+                if right_angle < 30 and left_angle < 30:
+                    self.arms_down_check_frames += 1
+                    if self.arms_down_check_frames >= 30:  # 1 second at 30fps
+                        self.assessment_state = 'left_arm'
+                        self.current_arm = 'left'
+                        self.arms_down_check_frames = 0
+                        instruction = "Good! Now raise your LEFT arm out to the side"
+                    else:
+                        instruction = "Hold both arms at your sides..."
+                else:
+                    self.arms_down_check_frames = 0
+                    instruction = "Please lower BOTH arms to your sides"
 
-                if self.rom_stats['test_start_time'] is None:
-                    self.rom_stats['test_start_time'] = datetime.now()
-                    self.rom_stats['start_position_angle'] = active_angle
+                active_angle = max(right_angle, left_angle)
+                active_side = "right" if right_angle > left_angle else "left"
+
+            # LEFT ARM ASSESSMENT STATE
+            elif self.assessment_state == 'left_arm':
+                active_angle = left_angle
+                active_side = 'left'
+                stats = self.left_arm_stats
+
+                stats['total_frames'] += 1
+                stats['angle_history'].append(active_angle)
+
+                if stats['test_start_time'] is None:
+                    stats['test_start_time'] = datetime.now()
+                    stats['start_position_angle'] = active_angle
 
                 # Update max/min
-                if active_angle > self.rom_stats['max_angle']:
-                    self.rom_stats['max_angle'] = active_angle
-                if active_angle < self.rom_stats['min_angle']:
-                    self.rom_stats['min_angle'] = active_angle
+                if active_angle > stats['max_angle']:
+                    stats['max_angle'] = active_angle
+                if active_angle < stats['min_angle']:
+                    stats['min_angle'] = active_angle
 
                 # Check increments
                 current_increment = int(active_angle // 10) * 10
-                if current_increment not in self.rom_stats['increment_markers'] and current_increment > 0:
-                    self.rom_stats['increment_markers'].add(current_increment)
+                if current_increment not in stats['increment_markers'] and current_increment > 0:
+                    stats['increment_markers'].add(current_increment)
                     increment_reached = current_increment
 
-                # Dynamic instructions with specific arm guidance
+                # LEFT ARM specific instructions
                 if active_angle < 20:
-                    instruction = "RIGHT ARM: Keep at your side, palm facing leg"
+                    instruction = "LEFT ARM: Raise out to the side (not forward)"
                 elif active_angle < 45:
-                    instruction = "RIGHT ARM: Raise OUT TO SIDE (not forward)"
+                    instruction = "LEFT ARM: Continue raising to the side"
                 elif active_angle < 70:
-                    instruction = "Good! Continue raising RIGHT ARM to shoulder"
+                    instruction = "Good! LEFT ARM approaching shoulder height"
                 elif active_angle < 90:
-                    instruction = "Almost there! RIGHT ARM approaching shoulder"
+                    instruction = "Great! LEFT ARM at shoulder level"
                 elif active_angle < 110:
-                    instruction = "Excellent! Keep raising RIGHT ARM above shoulder"
+                    instruction = "Excellent! Keep raising LEFT ARM higher"
                 elif active_angle < 130:
-                    instruction = "Great! Continue to 150° (keep arm straight)"
+                    instruction = "Almost there! LEFT ARM continue to 150°"
                 elif active_angle < 150:
-                    instruction = "Almost at target! Just a bit higher..."
+                    instruction = "Nearly at target! Just a bit higher..."
                 else:
-                    instruction = "Perfect! You reached 150°! Hold briefly"
+                    instruction = "Perfect! LEFT ARM reached 150°! Hold..."
 
-                # Complete test
-                if (active_angle >= 150 and self.rom_stats['total_frames'] >= 60) or self.rom_stats['total_frames'] >= 450:
+                # Complete left arm test
+                if (active_angle >= 150 and stats['total_frames'] >= 60) or stats['total_frames'] >= 300:
+                    stats['test_end_time'] = datetime.now()
+                    self.assessment_state = 'left_complete'
+                    instruction = "Left arm complete! Lower it and prepare right arm"
+
+            # LEFT ARM COMPLETE - Brief transition state
+            elif self.assessment_state == 'left_complete':
+                active_angle = left_angle
+                active_side = 'left'
+
+                # Check if left arm is lowered
+                if left_angle < 30:
+                    self.arms_down_check_frames += 1
+                    if self.arms_down_check_frames >= 20:  # Brief pause
+                        self.assessment_state = 'right_arm'
+                        self.current_arm = 'right'
+                        self.arms_down_check_frames = 0
+                        instruction = "Now raise your RIGHT arm out to the side"
+                    else:
+                        instruction = "Good! Prepare to test right arm..."
+                else:
+                    instruction = "Lower your left arm to your side"
+
+            # RIGHT ARM ASSESSMENT STATE
+            elif self.assessment_state == 'right_arm':
+                active_angle = right_angle
+                active_side = 'right'
+                stats = self.right_arm_stats
+
+                stats['total_frames'] += 1
+                stats['angle_history'].append(active_angle)
+
+                if stats['test_start_time'] is None:
+                    stats['test_start_time'] = datetime.now()
+                    stats['start_position_angle'] = active_angle
+
+                # Update max/min
+                if active_angle > stats['max_angle']:
+                    stats['max_angle'] = active_angle
+                if active_angle < stats['min_angle']:
+                    stats['min_angle'] = active_angle
+
+                # Check increments
+                current_increment = int(active_angle // 10) * 10
+                if current_increment not in stats['increment_markers'] and current_increment > 0:
+                    stats['increment_markers'].add(current_increment)
+                    increment_reached = current_increment
+
+                # RIGHT ARM specific instructions
+                if active_angle < 20:
+                    instruction = "RIGHT ARM: Raise out to the side (not forward)"
+                elif active_angle < 45:
+                    instruction = "RIGHT ARM: Continue raising to the side"
+                elif active_angle < 70:
+                    instruction = "Good! RIGHT ARM approaching shoulder height"
+                elif active_angle < 90:
+                    instruction = "Great! RIGHT ARM at shoulder level"
+                elif active_angle < 110:
+                    instruction = "Excellent! Keep raising RIGHT ARM higher"
+                elif active_angle < 130:
+                    instruction = "Almost there! RIGHT ARM continue to 150°"
+                elif active_angle < 150:
+                    instruction = "Nearly at target! Just a bit higher..."
+                else:
+                    instruction = "Perfect! RIGHT ARM reached 150°! Hold..."
+
+                # Complete right arm test
+                if (active_angle >= 150 and stats['total_frames'] >= 60) or stats['total_frames'] >= 300:
+                    stats['test_end_time'] = datetime.now()
                     self.assessment_state = 'complete'
-                    self.rom_stats['test_end_time'] = datetime.now()
-                    instruction = "Assessment complete!"
+                    instruction = "Assessment complete for both arms!"
 
+            # COMPLETE STATE - Show full report
             elif self.assessment_state == 'complete':
                 instruction = "Test complete - Lower your arm"
+                active_angle = max(right_angle, left_angle)
+                active_side = "right" if right_angle > left_angle else "left"
 
-            # Generate report if complete
-            report = None
-            if self.assessment_state == 'complete' and self.rom_stats['test_end_time']:
-                duration = (self.rom_stats['test_end_time'] - self.rom_stats['test_start_time']).total_seconds()
+                # Generate combined report
+                left_duration = (self.left_arm_stats['test_end_time'] - self.left_arm_stats['test_start_time']).total_seconds() if self.left_arm_stats['test_end_time'] else 0
+                right_duration = (self.right_arm_stats['test_end_time'] - self.right_arm_stats['test_start_time']).total_seconds() if self.right_arm_stats['test_end_time'] else 0
+
                 report = {
-                    'max_angle': round(self.rom_stats['max_angle'], 1),
-                    'min_angle': round(self.rom_stats['min_angle'], 1),
-                    'range_of_motion': round(self.rom_stats['max_angle'] - self.rom_stats['min_angle'], 1),
-                    'average_angle': round(np.mean(self.rom_stats['angle_history']), 1) if self.rom_stats['angle_history'] else 0,
-                    'test_duration': round(duration, 1),
-                    'increments_achieved': sorted(list(self.rom_stats['increment_markers'])),
-                    'performance_rating': self._calculate_performance_rating(self.rom_stats['max_angle'])
+                    'left_arm': {
+                        'max_angle': round(self.left_arm_stats['max_angle'], 1),
+                        'range_of_motion': round(self.left_arm_stats['max_angle'] - self.left_arm_stats['min_angle'], 1),
+                        'test_duration': round(left_duration, 1),
+                        'increments_achieved': sorted(list(self.left_arm_stats['increment_markers'])),
+                        'performance_rating': self._calculate_performance_rating(self.left_arm_stats['max_angle'])
+                    },
+                    'right_arm': {
+                        'max_angle': round(self.right_arm_stats['max_angle'], 1),
+                        'range_of_motion': round(self.right_arm_stats['max_angle'] - self.right_arm_stats['min_angle'], 1),
+                        'test_duration': round(right_duration, 1),
+                        'increments_achieved': sorted(list(self.right_arm_stats['increment_markers'])),
+                        'performance_rating': self._calculate_performance_rating(self.right_arm_stats['max_angle'])
+                    },
+                    'comparison': 'Balanced' if abs(self.left_arm_stats['max_angle'] - self.right_arm_stats['max_angle']) < 10 else 'Asymmetric'
                 }
 
             return {
@@ -254,11 +370,13 @@ class PoseDetector:
                 'active_side': active_side,
                 'active_angle': round(active_angle, 1),
                 'assessment_state': self.assessment_state,
+                'current_arm': self.current_arm,
                 'instruction': instruction,
                 'increment_reached': increment_reached,
-                'progress_percentage': min(100, (active_angle / 180) * 100),
+                'progress_percentage': min(100, (active_angle / 150) * 100),
                 'target_angle': 150,
-                'measurement_confidence': round(max(right_shoulder_lm.visibility, left_shoulder_lm.visibility) * 100, 1),
+                'measurement_confidence': round(max(right_shoulder_lm.visibility if right_visible else 0,
+                                                   left_shoulder_lm.visibility if left_visible else 0) * 100, 1),
                 'report': report
             }
 
