@@ -2,7 +2,9 @@
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background: linear-gradient(to bottom, #959aa2, #475B63);
+  background: linear-gradient(to bottom, #959aa2, #275286);
+  font-weight: bold;
+  font-size: 18px;
   min-height: 100vh; /* ensures it fills the whole screen height */
   color: #272932;
 }
@@ -14,6 +16,19 @@ body.homepage {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+}
+
+.bitcount-title {
+  font-family: "Bitcount Grid Single", system-ui;
+  font-weight: 900;          /* bold weight */
+  font-size: 70px; 
+  font-style: normal;
+  font-optical-sizing: auto;
+  font-variation-settings:
+    "slnt" 0,
+    "CRSV" 0.5,
+    "ELSH" 0,
+    "ELXP" 0;
 }
 
 nav { 

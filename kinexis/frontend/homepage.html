@@ -5,6 +5,10 @@
   <title>Kinexis</title>
   <link rel="stylesheet" href="styles.css">
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bitcount+Grid+Single:wght@400&display=swap" rel="stylesheet">
+
  <style>
   body.homepage {
     display: flex;
@@ -22,6 +26,14 @@
     padding-top: 100px; /* moves title/tagline down a bit */
   }
 
+main h1 {
+  margin-bottom: 10px; /* small space below the title */
+}
+
+main p {
+  margin-top: 0;       /* remove default top margin */
+  font-size: 18px;
+}
   .btn-container {
     display: flex;
     justify-content: center;
@@ -54,13 +66,13 @@
     <ul>
       <li><a href="homepage.html">Home</a></li>
       <li><a href="instructions.html">Instructions</a></li>
-      <li><a href="goals.html">Our Goals</a></li>
+      <li><a href="goals.html">Our Mission</a></li>
     </ul>
   </nav>
 
   <main>
-    <h1>Welcome to <span style="color: #AA2513;">Kinexis!</span></h1>
-    <p>Your privacy-first motion tracker.</p>
+    <h1 class="bitcount-title">Welcome to <span style="color: #AA2513;">Kinexis!</span></h1>
+    <p>Objective PT Recovery. Fast. Accurate. Affordable.</p>
   </main>
   
   <div class="btn-container">
