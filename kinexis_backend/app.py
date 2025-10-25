@@ -14,13 +14,21 @@ from flask_cors import CORS
 from flask_socketio import SocketIO, emit
 from flask_sqlalchemy import SQLAlchemy
 
-# Try to import the real pose detector, fall back to mock if MediaPipe unavailable
+# Try to import the V2 pose detector with enhanced shoulder abduction
 try:
-    from pose_detector import PoseDetector
-    print("Using real MediaPipe pose detector")
+    from pose_detector_v2 import PoseDetectorV2 as PoseDetector
+    print("✨ Using enhanced PoseDetectorV2 with improved shoulder abduction ROM test")
 except ImportError:
-    print("MediaPipe not available, using mock pose detector")
-    from pose_detector_mock import PoseDetector
+    try:
+        from pose_detector_integrated import PoseDetector
+        print("Using integrated MediaPipe pose detector with new shoulder abduction")
+    except ImportError:
+        try:
+            from pose_detector import PoseDetector
+            print("Using original MediaPipe pose detector")
+        except ImportError:
+            print("MediaPipe not available, using mock pose detector")
+            from pose_detector_mock import PoseDetector
 
 import io
 
@@ -212,6 +220,34 @@ def get_session(session_id):
     session = Session.query.get_or_404(session_id)
     return jsonify(session.to_dict())
 
+@app.route('/api/test_mediapipe')
+def test_mediapipe():
+    """Test if MediaPipe is working"""
+    import mediapipe as mp
+    try:
+        mp_pose = mp.solutions.pose
+        pose = mp_pose.Pose(
+            static_image_mode=False,
+            model_complexity=0,
+            min_detection_confidence=0.3,
+            min_tracking_confidence=0.3
+        )
+        # Create a simple test image
+        test_img = np.zeros((480, 640, 3), dtype=np.uint8)
+        test_img[:] = (255, 255, 255)  # White background
+        result = pose.process(test_img)
+        pose.close()
+        return jsonify({
+            'mediapipe_status': 'working',
+            'test_result': 'success',
+            'pose_detected': result.pose_landmarks is not None
+        })
+    except Exception as e:
+        return jsonify({
+            'mediapipe_status': 'error',
+            'error': str(e)
+        })
+
 @app.route('/api/exercises')
 def get_exercises():
     """Get available exercises and their descriptions"""
@@ -303,9 +339,9 @@ def handle_process_frame(data):
 
         # Debug: Check frame properties
         if is_calibration:
-            print(f"🎯 CALIBRATION FRAME: shape={frame.shape}, dtype={frame.dtype}, mean={np.mean(frame):.1f}")
-        else:
-            print(f"Received frame: shape={frame.shape}, dtype={frame.dtype}, mean={np.mean(frame):.1f}, calibration={is_calibration}")
+            print(f"🎯 CALIBRATION FRAME RECEIVED: shape={frame.shape}, dtype={frame.dtype}")
+            print(f"   Frame stats: min={np.min(frame)}, max={np.max(frame)}, mean={np.mean(frame):.1f}")
+        # Remove regular frame logging to reduce noise
 
         # Reset assessment on first shoulder abduction frame (ensure initialization)
         if exercise_type == 'shoulder_abduction' and not is_calibration:
@@ -321,9 +357,9 @@ def handle_process_frame(data):
         if is_calibration:
             print(f"📊 Calibration result: {measurements}")
 
-        # Debug: Log what we're sending for shoulder abduction
-        if exercise_type == 'shoulder_abduction' and not is_calibration:
-            print(f"📍 Shoulder Abduction Measurements: assessment_state={measurements.get('assessment_state')}, angle={measurements.get('active_angle')}, instruction={measurements.get('instruction')}")
+        # Debug: Log only calibration results, not every frame
+        if is_calibration and 'calibration_status' in measurements:
+            print(f"📊 Calibration result: status={measurements.get('calibration_status')}, landmarks={measurements.get('visible_landmarks')}")
 
         # Update session data if active
         if session_key in active_sessions:
@@ -349,7 +385,7 @@ def handle_process_frame(data):
 
         # Resize annotated frame while preserving aspect ratio
         height, width = annotated_frame.shape[:2]
-        max_dimension = 960  # Higher resolution for better quality
+        max_dimension = 1280  # Increased resolution for better quality
 
         if width > max_dimension or height > max_dimension:
             if width > height:
@@ -358,10 +394,10 @@ def handle_process_frame(data):
                 scale = max_dimension / height
             new_width = int(width * scale)
             new_height = int(height * scale)
-            annotated_frame = cv2.resize(annotated_frame, (new_width, new_height), interpolation=cv2.INTER_LINEAR)
+            annotated_frame = cv2.resize(annotated_frame, (new_width, new_height), interpolation=cv2.INTER_CUBIC)
 
-        # Convert annotated frame back to base64 with better quality
-        _, buffer = cv2.imencode('.jpg', annotated_frame, [cv2.IMWRITE_JPEG_QUALITY, 85])
+        # Convert annotated frame back to base64 with maximum quality
+        _, buffer = cv2.imencode('.jpg', annotated_frame, [cv2.IMWRITE_JPEG_QUALITY, 95])
         processed_image = base64.b64encode(buffer).decode('utf-8')
 
         # Send results back to client
