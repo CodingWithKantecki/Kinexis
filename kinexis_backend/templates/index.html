@@ -1,0 +1,2111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kinexis Backend - Pose Test</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #000;
+            overflow: hidden;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+        }
+        #startScreen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(180deg, #f5f7fa 0%, #e1e5ea 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Technical line pattern background */
+        .tech-pattern {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        /* Grid nodes - connection points */
+        .node-grid {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .node {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: #D2A10C;
+            border-radius: 50%;
+            opacity: 0.3;
+        }
+
+        .node::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border: 1px solid #D2A10C;
+            border-radius: 50%;
+            top: -3px;
+            left: -3px;
+            opacity: 0;
+            animation: nodePulse 3s ease-in-out infinite;
+        }
+
+        /* Node positions - creating a grid */
+        .node:nth-child(1) { top: 15%; left: 20%; animation-delay: 0s; }
+        .node:nth-child(2) { top: 15%; left: 50%; animation-delay: 0.5s; }
+        .node:nth-child(3) { top: 15%; left: 80%; animation-delay: 1s; }
+        .node:nth-child(4) { top: 35%; left: 10%; animation-delay: 0.3s; }
+        .node:nth-child(5) { top: 35%; left: 35%; animation-delay: 0.8s; }
+        .node:nth-child(6) { top: 35%; left: 65%; animation-delay: 1.3s; }
+        .node:nth-child(7) { top: 35%; left: 90%; animation-delay: 1.8s; }
+        .node:nth-child(8) { top: 55%; left: 25%; animation-delay: 0.6s; }
+        .node:nth-child(9) { top: 55%; left: 50%; animation-delay: 1.1s; }
+        .node:nth-child(10) { top: 55%; left: 75%; animation-delay: 1.6s; }
+        .node:nth-child(11) { top: 75%; left: 15%; animation-delay: 0.9s; }
+        .node:nth-child(12) { top: 75%; left: 40%; animation-delay: 1.4s; }
+        .node:nth-child(13) { top: 75%; left: 60%; animation-delay: 1.9s; }
+        .node:nth-child(14) { top: 75%; left: 85%; animation-delay: 2.4s; }
+        .node:nth-child(15) { top: 90%; left: 30%; animation-delay: 1.2s; }
+        .node:nth-child(16) { top: 90%; left: 70%; animation-delay: 1.7s; }
+
+        @keyframes nodePulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(2);
+                opacity: 0.5;
+            }
+        }
+
+        /* Connecting lines between nodes */
+        .connection-lines {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .connection {
+            position: absolute;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #AA2513, transparent);
+            transform-origin: left center;
+            opacity: 0.2;
+            animation: connectionDraw 4s ease-in-out infinite;
+        }
+
+        /* Diagonal and straight connections */
+        .connection:nth-child(1) {
+            width: 200px;
+            top: 15%;
+            left: 20%;
+            transform: rotate(25deg);
+            animation-delay: 0s;
+        }
+        .connection:nth-child(2) {
+            width: 350px;
+            top: 15%;
+            left: 50%;
+            transform: rotate(-15deg);
+            animation-delay: 0.5s;
+        }
+        .connection:nth-child(3) {
+            width: 250px;
+            top: 35%;
+            left: 10%;
+            transform: rotate(45deg);
+            animation-delay: 1s;
+        }
+        .connection:nth-child(4) {
+            width: 300px;
+            top: 35%;
+            left: 35%;
+            transform: rotate(-30deg);
+            animation-delay: 1.5s;
+        }
+        .connection:nth-child(5) {
+            width: 180px;
+            top: 55%;
+            left: 25%;
+            transform: rotate(20deg);
+            animation-delay: 2s;
+        }
+        .connection:nth-child(6) {
+            width: 220px;
+            top: 55%;
+            left: 50%;
+            transform: rotate(-45deg);
+            animation-delay: 2.5s;
+        }
+        .connection:nth-child(7) {
+            width: 280px;
+            top: 75%;
+            left: 15%;
+            transform: rotate(35deg);
+            animation-delay: 3s;
+        }
+        .connection:nth-child(8) {
+            width: 320px;
+            top: 75%;
+            left: 40%;
+            transform: rotate(-20deg);
+            animation-delay: 3.5s;
+        }
+
+        @keyframes connectionDraw {
+            0%, 100% {
+                width: 0;
+                opacity: 0;
+            }
+            50% {
+                width: 100%;
+                opacity: 0.3;
+            }
+        }
+
+        /* Angle measurements */
+        .angle-indicators {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .angle-arc {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+        }
+
+        .arc-path {
+            stroke: #D2A10C;
+            stroke-width: 1;
+            fill: none;
+            stroke-dasharray: 40;
+            stroke-dashoffset: 40;
+            opacity: 0.4;
+            animation: drawAngle 3s ease-in-out infinite;
+        }
+
+        .angle-text {
+            position: absolute;
+            color: #AA2513;
+            font-size: 10px;
+            font-family: 'Courier New', monospace;
+            opacity: 0;
+            animation: angleAppear 3s ease-in-out infinite;
+        }
+
+        /* Angle indicator positions */
+        .angle-indicator:nth-child(1) { top: 30%; left: 25%; }
+        .angle-indicator:nth-child(2) { top: 50%; right: 30%; }
+        .angle-indicator:nth-child(3) { bottom: 25%; left: 40%; }
+        .angle-indicator:nth-child(4) { top: 20%; right: 20%; }
+
+        .angle-indicator:nth-child(1) .angle-text::after { content: "45°"; }
+        .angle-indicator:nth-child(2) .angle-text::after { content: "90°"; }
+        .angle-indicator:nth-child(3) .angle-text::after { content: "120°"; }
+        .angle-indicator:nth-child(4) .angle-text::after { content: "60°"; }
+
+        @keyframes drawAngle {
+            0%, 100% {
+                stroke-dashoffset: 40;
+                opacity: 0;
+            }
+            50% {
+                stroke-dashoffset: 0;
+                opacity: 0.5;
+            }
+        }
+
+        @keyframes angleAppear {
+            0%, 100% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            60%, 90% {
+                opacity: 0.6;
+                transform: scale(1);
+            }
+        }
+
+        /* Grid lines */
+        .grid-lines {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0.05;
+        }
+
+        .grid-line {
+            position: absolute;
+            background: #D2A10C;
+        }
+
+        .grid-line.horizontal {
+            width: 100%;
+            height: 1px;
+            left: 0;
+        }
+
+        .grid-line.vertical {
+            width: 1px;
+            height: 100%;
+            top: 0;
+        }
+
+        .grid-line.horizontal:nth-child(1) { top: 10%; }
+        .grid-line.horizontal:nth-child(2) { top: 20%; }
+        .grid-line.horizontal:nth-child(3) { top: 30%; }
+        .grid-line.horizontal:nth-child(4) { top: 40%; }
+        .grid-line.horizontal:nth-child(5) { top: 50%; }
+        .grid-line.horizontal:nth-child(6) { top: 60%; }
+        .grid-line.horizontal:nth-child(7) { top: 70%; }
+        .grid-line.horizontal:nth-child(8) { top: 80%; }
+        .grid-line.horizontal:nth-child(9) { top: 90%; }
+
+        .grid-line.vertical:nth-child(10) { left: 10%; }
+        .grid-line.vertical:nth-child(11) { left: 20%; }
+        .grid-line.vertical:nth-child(12) { left: 30%; }
+        .grid-line.vertical:nth-child(13) { left: 40%; }
+        .grid-line.vertical:nth-child(14) { left: 50%; }
+        .grid-line.vertical:nth-child(15) { left: 60%; }
+        .grid-line.vertical:nth-child(16) { left: 70%; }
+        .grid-line.vertical:nth-child(17) { left: 80%; }
+        .grid-line.vertical:nth-child(18) { left: 90%; }
+
+        /* Calculation numbers floating */
+        .calc-numbers {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+
+        .calc-num {
+            position: absolute;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            color: #AA2513;
+            opacity: 0;
+            animation: calcFade 5s ease-in-out infinite;
+        }
+
+        .calc-num:nth-child(1) { top: 25%; left: 15%; animation-delay: 0s; }
+        .calc-num:nth-child(1)::after { content: "θ = 45.2°"; }
+
+        .calc-num:nth-child(2) { top: 45%; left: 70%; animation-delay: 1s; }
+        .calc-num:nth-child(2)::after { content: "∠ = 90.0°"; }
+
+        .calc-num:nth-child(3) { top: 65%; left: 40%; animation-delay: 2s; }
+        .calc-num:nth-child(3)::after { content: "ROM: 120°"; }
+
+        .calc-num:nth-child(4) { top: 35%; right: 25%; animation-delay: 3s; }
+        .calc-num:nth-child(4)::after { content: "Δ = 15.7°"; }
+
+        .calc-num:nth-child(5) { bottom: 30%; left: 60%; animation-delay: 4s; }
+        .calc-num:nth-child(5)::after { content: "α = 67.3°"; }
+
+        @keyframes calcFade {
+            0%, 100% {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            20%, 80% {
+                opacity: 0.4;
+                transform: translateY(0);
+            }
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px);
+            }
+            50% {
+                transform: translateY(-30px);
+            }
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes slideRight {
+            0% {
+                left: -150px;
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.08;
+            }
+            90% {
+                opacity: 0.08;
+            }
+            100% {
+                left: 100%;
+                opacity: 0;
+            }
+        }
+
+        @keyframes slideLeft {
+            0% {
+                right: -150px;
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.08;
+            }
+            90% {
+                opacity: 0.08;
+            }
+            100% {
+                right: 100%;
+                opacity: 0;
+            }
+        }
+
+        @keyframes heartbeat {
+            0% {
+                stroke-dashoffset: 300;
+            }
+            50% {
+                stroke-dashoffset: 0;
+            }
+            100% {
+                stroke-dashoffset: -300;
+            }
+        }
+
+        @keyframes drawArc {
+            0% {
+                stroke-dashoffset: 150;
+            }
+            50% {
+                stroke-dashoffset: 0;
+            }
+            100% {
+                stroke-dashoffset: -150;
+            }
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% {
+                opacity: 0;
+            }
+            50% {
+                opacity: 0.6;
+            }
+        }
+        #startBtn {
+            padding: 20px 60px;
+            font-size: 24px;
+            font-weight: 400;
+            background: linear-gradient(90deg, #D2A10C 0%, #AA2513 50%, #D2A10C 100%);
+            background-size: 200% 100%;
+            animation: gradientShift 3s ease infinite;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: none;
+            letter-spacing: 2px;
+            box-shadow: 0 4px 12px rgba(210, 161, 12, 0.3);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        }
+        #startBtn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(170, 37, 19, 0.4);
+            background: linear-gradient(90deg, #D2A10C 0%, #AA2513 50%, #D2A10C 100%);
+        }
+        #startBtn:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        .start-title {
+            font-size: 48px;
+            font-weight: 200;
+            color: #2d3748;
+            margin-bottom: 20px;
+            letter-spacing: 4px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            position: relative;
+            z-index: 10;
+        }
+        .start-subtitle {
+            font-size: 16px;
+            font-weight: 400;
+            color: #718096;
+            margin-bottom: 60px;
+            letter-spacing: 1px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Wii Fit style subtle circle decoration */
+        .button-container {
+            position: relative;
+            display: inline-block;
+            z-index: 10;
+        }
+
+        .button-circle {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border: 2px solid rgba(210, 161, 12, 0.2);
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            animation: pulse-circle 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-circle {
+            0%, 100% {
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 0.3;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.1);
+                opacity: 0.1;
+            }
+        }
+        #webcamView {
+            display: none;
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        #webcamView.visible {
+            opacity: 1;
+        }
+        #webcam {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+            transform: scaleX(-1) translateZ(0);  /* Mirror the webcam for intuitive movement */
+            -webkit-transform: scaleX(-1) translateZ(0);
+            will-change: transform;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        #processedFeed {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 2;
+            opacity: 1;
+            display: none;
+            pointer-events: none;
+            transform: scaleX(-1) translateZ(0);  /* Mirror the processed feed too */
+            -webkit-transform: scaleX(-1) translateZ(0);
+            will-change: transform;
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+        }
+        #canvas {
+            display: none;
+        }
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            background: rgba(0,0,0,0.7);
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            max-width: 400px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            display: none;
+        }
+
+        /* White fade transition */
+        #whiteTransition {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(180deg,
+                rgba(255,255,255,1) 0%,
+                rgba(245,247,250,1) 100%);
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: opacity;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+        }
+
+        #whiteTransition.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* Loading indicator */
+        .loading-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            animation: fadeInUp 0.8s ease-out forwards;
+        }
+
+        #whiteTransition.active .loading-container {
+            display: flex;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -40%);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .loading-text {
+            font-size: 24px;
+            font-weight: 200;
+            color: #4a5568;
+            letter-spacing: 3px;
+            margin-top: 20px;
+        }
+
+        .loading-dots {
+            display: flex;
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .loading-dot {
+            width: 8px;
+            height: 8px;
+            background: #D2A10C;
+            border-radius: 50%;
+            animation: pulse 1.4s ease-in-out infinite;
+        }
+
+        .loading-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .loading-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes pulse {
+            0%, 60%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            30% {
+                transform: scale(1.5);
+                opacity: 0.7;
+            }
+        }
+
+        /* Camera initialization overlay */
+        #cameraInit {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0);
+            backdrop-filter: blur(0px);
+            -webkit-backdrop-filter: blur(0px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1500;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        #cameraInit.visible {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        /* Exercise selection overlay */
+        #exerciseSelect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1500;
+        }
+
+        .exercise-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 27px;
+            padding: 54px;
+            max-width: 810px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .exercise-title {
+            font-size: 38px;
+            font-weight: 200;
+            color: #2d3748;
+            margin-bottom: 40px;
+            letter-spacing: 3px;
+        }
+
+        .exercise-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 27px;
+        }
+
+        .exercise-btn {
+            background: white;
+            border: 3px solid #e2e8f0;
+            padding: 27px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .exercise-info {
+            flex: 1;
+        }
+
+        .exercise-preview {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            margin-left: 27px;
+        }
+
+        .exercise-preview img {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .exercise-preview img.active {
+            opacity: 1;
+        }
+
+        .exercise-btn:hover {
+            border-color: #D2A10C;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(210, 161, 12, 0.3);
+        }
+
+        .exercise-btn h3 {
+            font-size: 27px;
+            font-weight: 500;
+            color: #2d3748;
+            margin-bottom: 7px;
+        }
+
+        .exercise-btn p {
+            font-size: 19px;
+            color: #718096;
+            margin: 0;
+        }
+
+        /* Calibration overlay - positioned at top so video is still visible */
+        #calibrationOverlay {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: none;
+            z-index: 1550;
+            pointer-events: none;
+        }
+
+        .calibration-container {
+            text-align: center;
+            color: white;
+            padding: 30px 40px;
+            background: rgba(0, 0, 0, 0.85);
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+        }
+
+        .calibration-title {
+            font-size: 24px;
+            font-weight: 200;
+            letter-spacing: 6px;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .calibration-status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            min-height: 40px;
+        }
+
+        .calibration-spinner {
+            width: 30px;
+            height: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: calibrationSpin 1s linear infinite;
+        }
+
+        @keyframes calibrationSpin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .calibration-message {
+            font-size: 18px;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .calibration-instruction {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.8);
+            letter-spacing: 1px;
+        }
+
+        .calibration-success {
+            color: #D2A10C !important;
+        }
+
+        .calibration-error {
+            color: #AA2513 !important;
+        }
+
+        /* Countdown overlay */
+        #countdownOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.4); /* More transparent so you can see live tracking underneath */
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1600;
+            pointer-events: none; /* Allow interaction with elements below */
+        }
+
+        .countdown-number {
+            font-size: 120px;
+            font-weight: 200;
+            color: white;
+            animation: countdownPulse 1s ease-in-out;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 50%;
+            width: 180px;
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+        }
+
+        @keyframes countdownPulse {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.8;
+            }
+        }
+
+        .init-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 900px;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: scale(0.95) translateY(20px);
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .init-content-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 40px;
+        }
+
+        .init-content {
+            flex: 1;
+            text-align: left;
+        }
+
+        .init-mascot {
+            flex: 0 0 auto;
+            text-align: center;
+        }
+
+        .init-mascot img {
+            width: 300px;
+            height: auto;
+            display: block;
+            margin-bottom: 5px;
+            animation: gentle-wave 2s ease-in-out infinite;
+        }
+
+        .mascot-message {
+            font-family: 'Kalam', cursive;
+            font-size: 18px;
+            color: #AA2513;
+            font-weight: 700;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            max-width: 280px;
+            margin: 0 auto;
+            line-height: 1.5;
+            transform: rotate(-2deg);
+            letter-spacing: 0.5px;
+        }
+
+        @keyframes subtle-bounce {
+            0%, 100% { transform: rotate(-2deg) translateY(0); }
+            50% { transform: rotate(-2deg) translateY(-3px); }
+        }
+
+        @keyframes gentle-wave {
+            0%, 100% { transform: rotate(-5deg); }
+            50% { transform: rotate(5deg); }
+        }
+
+        #cameraInit.visible .init-container {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            transition-delay: 0.3s;
+        }
+
+        .init-title {
+            font-size: 28px;
+            font-weight: 200;
+            color: #2d3748;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        .init-tips {
+            margin: 30px 0;
+            text-align: left;
+        }
+
+        .init-tip {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            color: #4a5568;
+            font-size: 16px;
+            font-weight: 300;
+        }
+
+        .tip-icon {
+            width: 8px;
+            height: 8px;
+            background: #D2A10C;
+            border-radius: 50%;
+            margin-right: 20px;
+            margin-left: 5px;
+            flex-shrink: 0;
+            opacity: 1;
+        }
+
+        @keyframes gradientFlow {
+            0% {
+                background-position: 0% 50%;
+            }
+            100% {
+                background-position: 200% 50%;
+            }
+        }
+
+        .continue-btn {
+            background: linear-gradient(90deg, #D2A10C 0%, #AA2513 50%, #D2A10C 100%);
+            background-size: 300% 100%;
+            animation: gradientFlow 12s ease-in-out infinite;
+            will-change: background-position;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+            backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
+            color: white;
+            border: none;
+            padding: 15px 50px;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: block;
+            margin: 30px auto 0;
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        .continue-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.5);
+        }
+
+        .continue-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Bottom overlay bar - Transparent glassmorphism style */
+        #bottomOverlay {
+            position: fixed !important;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: linear-gradient(to bottom,
+                rgba(0, 0, 0, 0) 0%,
+                rgba(0, 0, 0, 0.3) 100%);
+            display: none;
+            grid-template-columns: 200px 1fr 200px;
+            align-items: center;
+            padding: 0 60px;
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 1000;
+            visibility: visible !important;
+            will-change: opacity;
+            transform: translateZ(0);
+            -webkit-transform: translateZ(0);
+        }
+
+        #repCounter {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px 24px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: none;
+        }
+
+        #repCounter .metric-value {
+            font-size: 32px;
+            font-weight: 300;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+            letter-spacing: 0;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            white-space: nowrap;
+        }
+
+        #exerciseName {
+            font-size: 24px;
+            font-weight: 200;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            text-align: center;
+            flex-grow: 1;
+            color: rgba(255,255,255,0.9);
+            text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        }
+
+        #angleDisplay {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px 24px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: none;
+        }
+
+        #angleDisplay .metric-value {
+            font-size: 32px;
+            font-weight: 300;
+            font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+            letter-spacing: 0;
+            text-align: center;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            white-space: nowrap;
+        }
+
+        .metric-label {
+            font-size: 12px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 4px;
+            color: rgba(255,255,255,0.8);
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+
+        .metric-box {
+            text-align: center;
+            width: 200px;
+            flex-shrink: 0;
+        }
+
+        /* Progress bar - Golden theme style */
+        #progressBar {
+            position: fixed;
+            bottom: 100px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(170, 37, 19, 0.2);
+            z-index: 999;
+        }
+
+        #progressFill {
+            height: 100%;
+            background: linear-gradient(90deg, #D2A10C 0%, #AA2513 50%, #D2A10C 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+            box-shadow: 0 0 12px rgba(210, 161, 12, 0.6);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        @keyframes glow {
+            0%, 100% { filter: brightness(1); }
+            50% { filter: brightness(1.2); }
+        }
+
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 200% 50%; }
+        }
+    </style>
+</head>
+<body>
+    <div id="startScreen">
+        <!-- Technical line pattern background -->
+        <div class="tech-pattern">
+
+            <!-- Grid lines (subtle background grid) -->
+            <div class="grid-lines">
+                <div class="grid-line horizontal"></div>
+                <div class="grid-line horizontal"></div>
+                <div class="grid-line horizontal"></div>
+                <div class="grid-line horizontal"></div>
+                <div class="grid-line horizontal"></div>
+                <div class="grid-line horizontal"></div>
+                <div class="grid-line horizontal"></div>
+                <div class="grid-line horizontal"></div>
+                <div class="grid-line horizontal"></div>
+                <div class="grid-line vertical"></div>
+                <div class="grid-line vertical"></div>
+                <div class="grid-line vertical"></div>
+                <div class="grid-line vertical"></div>
+                <div class="grid-line vertical"></div>
+                <div class="grid-line vertical"></div>
+                <div class="grid-line vertical"></div>
+                <div class="grid-line vertical"></div>
+                <div class="grid-line vertical"></div>
+            </div>
+
+            <!-- Connection nodes -->
+            <div class="node-grid">
+                <div class="node"></div>
+                <div class="node"></div>
+                <div class="node"></div>
+                <div class="node"></div>
+                <div class="node"></div>
+                <div class="node"></div>
+                <div class="node"></div>
+                <div class="node"></div>
+                <div class="node"></div>
+                <div class="node"></div>
+                <div class="node"></div>
+                <div class="node"></div>
+                <div class="node"></div>
+                <div class="node"></div>
+                <div class="node"></div>
+                <div class="node"></div>
+            </div>
+
+            <!-- Connecting lines between nodes -->
+            <div class="connection-lines">
+                <div class="connection"></div>
+                <div class="connection"></div>
+                <div class="connection"></div>
+                <div class="connection"></div>
+                <div class="connection"></div>
+                <div class="connection"></div>
+                <div class="connection"></div>
+                <div class="connection"></div>
+            </div>
+
+            <!-- Angle measurements -->
+            <div class="angle-indicators">
+                <div class="angle-indicator">
+                    <svg class="angle-arc" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
+                        <path class="arc-path" d="M 30 30 L 50 30 A 20 20 0 0 0 40 10" />
+                    </svg>
+                    <span class="angle-text"></span>
+                </div>
+                <div class="angle-indicator">
+                    <svg class="angle-arc" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
+                        <path class="arc-path" d="M 30 30 L 50 30 A 20 20 0 0 0 30 10" />
+                    </svg>
+                    <span class="angle-text"></span>
+                </div>
+                <div class="angle-indicator">
+                    <svg class="angle-arc" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
+                        <path class="arc-path" d="M 30 30 L 50 30 A 20 20 0 0 0 20 15" />
+                    </svg>
+                    <span class="angle-text"></span>
+                </div>
+                <div class="angle-indicator">
+                    <svg class="angle-arc" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60">
+                        <path class="arc-path" d="M 30 30 L 50 30 A 20 20 0 0 0 35 15" />
+                    </svg>
+                    <span class="angle-text"></span>
+                </div>
+            </div>
+
+            <!-- Floating calculation numbers -->
+            <div class="calc-numbers">
+                <div class="calc-num"></div>
+                <div class="calc-num"></div>
+                <div class="calc-num"></div>
+                <div class="calc-num"></div>
+                <div class="calc-num"></div>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="start-title">KINEXIS</div>
+        <div class="start-subtitle">Physical Therapy Recovery System</div>
+        <div class="button-container">
+            <div class="button-circle"></div>
+            <button id="startBtn" onclick="startPoseDetection()">Start</button>
+        </div>
+    </div>
+
+    <!-- White transition overlay -->
+    <div id="whiteTransition">
+        <div class="loading-container">
+            <div class="loading-text">INITIALIZING</div>
+            <div class="loading-dots">
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+                <div class="loading-dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="webcamView">
+        <video id="webcam" autoplay muted></video>
+        <canvas id="canvas"></canvas>
+        <img id="processedFeed" alt="Processed video">
+        <div id="info">
+            <div id="status">Connecting...</div>
+            <div id="instructions" style="margin-top: 10px; font-size: 16px; color: #D2A10C;">
+                • Stand 5-8 feet back from camera<br>
+                • Ensure your FULL BODY is visible<br>
+                • Good lighting helps detection
+            </div>
+        </div>
+
+        <!-- Camera initialization overlay -->
+        <div id="cameraInit">
+            <div class="init-container">
+                <div class="init-content-wrapper">
+                    <div class="init-content">
+                        <div class="init-title">PREPARING YOUR SESSION</div>
+                        <div class="init-tips">
+                            <div class="init-tip">
+                                <div class="tip-icon"></div>
+                                <div>Stand 5-8 feet back from your camera</div>
+                            </div>
+                            <div class="init-tip">
+                                <div class="tip-icon"></div>
+                                <div>Ensure your full body is visible in frame</div>
+                            </div>
+                            <div class="init-tip">
+                                <div class="tip-icon"></div>
+                                <div>Good lighting improves tracking accuracy</div>
+                            </div>
+                            <div class="init-tip">
+                                <div class="tip-icon"></div>
+                                <div>Wear fitted clothing for best results</div>
+                            </div>
+                        </div>
+                        <button class="continue-btn" onclick="showExerciseSelection()">Continue</button>
+                    </div>
+                    <div class="init-mascot">
+                        <img src="/static/logowave.png" alt="Kinexis Mascot" />
+                        <div class="mascot-message">Your friendly coach will guide you through each exercise!</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exercise selection overlay -->
+        <div id="exerciseSelect">
+            <div class="exercise-container">
+                <div class="exercise-title">SELECT YOUR EXERCISE</div>
+                <div class="exercise-grid">
+                    <div class="exercise-btn" onclick="selectExercise('shoulder_abduction')">
+                        <div class="exercise-info">
+                            <h3>Shoulder Abduction</h3>
+                            <p>Raise your arm out to the side • Standing position</p>
+                        </div>
+                        <div class="exercise-preview" id="shoulderAbductionPreview">
+                            <img src="/static/arm1.png" class="active" alt="Shoulder Abduction Frame 1">
+                            <img src="/static/arm2.png" alt="Shoulder Abduction Frame 2">
+                            <img src="/static/arm3.png" alt="Shoulder Abduction Frame 3">
+                        </div>
+                    </div>
+                    <div class="exercise-btn" onclick="selectExercise('knee_flexion')">
+                        <div class="exercise-info">
+                            <h3>Knee Flexion</h3>
+                            <p>Bend your knee while seated • Side view</p>
+                        </div>
+                        <div class="exercise-preview" id="kneeFlexionPreview">
+                            <img src="/static/sit1.png" class="active" alt="Knee Flexion Frame 1">
+                            <img src="/static/sit2.png" alt="Knee Flexion Frame 2">
+                            <img src="/static/sit3.png" alt="Knee Flexion Frame 3">
+                        </div>
+                    </div>
+                    <div class="exercise-btn" onclick="selectExercise('shoulder_flexion')">
+                        <div class="exercise-info">
+                            <h3>Shoulder Flexion</h3>
+                            <p>Raise your arm forward and up • Standing position</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calibration overlay -->
+        <div id="calibrationOverlay">
+            <div class="calibration-container">
+                <div class="calibration-title">CALIBRATING</div>
+                <div class="calibration-status" id="calibrationStatus">
+                    <div class="calibration-spinner"></div>
+                    <div class="calibration-message">Checking body detection...</div>
+                </div>
+                <div class="calibration-instruction">Please ensure your entire body is visible in the frame</div>
+            </div>
+        </div>
+
+        <!-- Countdown overlay -->
+        <div id="countdownOverlay">
+            <div class="countdown-number" id="countdownNumber">3</div>
+        </div>
+
+        <!-- Progress bar -->
+        <div id="progressBar">
+            <div id="progressFill"></div>
+        </div>
+
+        <!-- Bottom overlay -->
+        <div id="bottomOverlay">
+            <div id="repCounter" class="metric-box">
+                <div class="metric-label">REPS</div>
+                <div class="metric-value">0/10</div>
+            </div>
+            <div id="exerciseName">DEMO MODE</div>
+            <div id="angleDisplay" class="metric-box">
+                <div class="metric-label">ANGLE</div>
+                <div class="metric-value">0°/150°</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Audio elements for calibration sounds -->
+    <audio id="calibrationCompleteSound" src="/static/audio/calibration_complete.wav" preload="auto"></audio>
+    <audio id="calibrationErrorSound" src="/static/audio/calibration_error.wav" preload="auto"></audio>
+
+    <script>
+        const socket = io('http://localhost:5001');
+        let isProcessing = false;
+        let sessionKey = 'test_session';
+
+        socket.on('connect', () => {
+            console.log('Connected to backend');
+        });
+
+        // Animate exercise preview images on hover
+        let kneeAnimationInterval = null;
+        let kneeCurrentIndex = 0;
+        let shoulderAnimationInterval = null;
+        let shoulderCurrentIndex = 0;
+
+        function startKneeAnimation() {
+            const preview = document.getElementById('kneeFlexionPreview');
+            if (!preview) return;
+
+            const images = preview.querySelectorAll('img');
+
+            // Clear any existing animation
+            if (kneeAnimationInterval) {
+                clearInterval(kneeAnimationInterval);
+            }
+
+            // Animation loop
+            kneeAnimationInterval = setInterval(() => {
+                // Remove active class from current image
+                images[kneeCurrentIndex].classList.remove('active');
+
+                // Move to next image
+                kneeCurrentIndex = (kneeCurrentIndex + 1) % images.length;
+
+                // Add active class to new image
+                images[kneeCurrentIndex].classList.add('active');
+            }, 500); // Change frame every 500ms
+        }
+
+        function stopKneeAnimation() {
+            const preview = document.getElementById('kneeFlexionPreview');
+            if (!preview) return;
+
+            // Clear animation
+            if (kneeAnimationInterval) {
+                clearInterval(kneeAnimationInterval);
+                kneeAnimationInterval = null;
+            }
+
+            // Reset to first frame
+            const images = preview.querySelectorAll('img');
+            images.forEach((img, index) => {
+                img.classList.toggle('active', index === 0);
+            });
+            kneeCurrentIndex = 0;
+        }
+
+        function startShoulderAnimation() {
+            const preview = document.getElementById('shoulderAbductionPreview');
+            if (!preview) return;
+
+            const images = preview.querySelectorAll('img');
+
+            // Clear any existing animation
+            if (shoulderAnimationInterval) {
+                clearInterval(shoulderAnimationInterval);
+            }
+
+            // Animation loop
+            shoulderAnimationInterval = setInterval(() => {
+                // Remove active class from current image
+                images[shoulderCurrentIndex].classList.remove('active');
+
+                // Move to next image
+                shoulderCurrentIndex = (shoulderCurrentIndex + 1) % images.length;
+
+                // Add active class to new image
+                images[shoulderCurrentIndex].classList.add('active');
+            }, 500); // Change frame every 500ms
+        }
+
+        function stopShoulderAnimation() {
+            const preview = document.getElementById('shoulderAbductionPreview');
+            if (!preview) return;
+
+            // Clear animation
+            if (shoulderAnimationInterval) {
+                clearInterval(shoulderAnimationInterval);
+                shoulderAnimationInterval = null;
+            }
+
+            // Reset to first frame
+            const images = preview.querySelectorAll('img');
+            images.forEach((img, index) => {
+                img.classList.toggle('active', index === 0);
+            });
+            shoulderCurrentIndex = 0;
+        }
+
+        // Set up hover events when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Animation only on hover for knee flexion
+            const kneeFlexionBtn = document.querySelector('[onclick="selectExercise(\'knee_flexion\')"]');
+            if (kneeFlexionBtn) {
+                kneeFlexionBtn.addEventListener('mouseenter', startKneeAnimation);
+                kneeFlexionBtn.addEventListener('mouseleave', stopKneeAnimation);
+            }
+
+            // Animation only on hover for shoulder abduction
+            const shoulderAbductionBtn = document.querySelector('[onclick="selectExercise(\'shoulder_abduction\')"]');
+            if (shoulderAbductionBtn) {
+                shoulderAbductionBtn.addEventListener('mouseenter', startShoulderAnimation);
+                shoulderAbductionBtn.addEventListener('mouseleave', stopShoulderAnimation);
+            }
+        });
+
+        async function startPoseDetection() {
+            // Show white transition with loading
+            const whiteTransition = document.getElementById('whiteTransition');
+            whiteTransition.classList.add('active');
+
+            // Wait for fade in to complete
+            await new Promise(resolve => setTimeout(resolve, 800));
+
+            // Hide start screen, show webcam view
+            document.getElementById('startScreen').style.display = 'none';
+            const webcamView = document.getElementById('webcamView');
+            webcamView.style.display = 'block';
+
+            // Initialize webcam
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        width: 1280,
+                        height: 720
+                    }
+                });
+                document.getElementById('webcam').srcObject = stream;
+
+                // Wait for camera to fully initialize
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                // Fade in webcam view
+                webcamView.classList.add('visible');
+
+                // Update loading text
+                const loadingText = document.querySelector('.loading-text');
+                if (loadingText) {
+                    loadingText.textContent = 'READY';
+                }
+
+                // Wait a moment to show ready state
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                // Fade out white transition smoothly
+                whiteTransition.classList.remove('active');
+
+                // Wait for fade out to complete
+                await new Promise(resolve => setTimeout(resolve, 1500));
+
+                // Show camera initialization overlay with smooth animation
+                const cameraInit = document.getElementById('cameraInit');
+                cameraInit.style.display = 'flex';
+
+                // Trigger the animation after a brief delay
+                await new Promise(resolve => setTimeout(resolve, 50));
+                cameraInit.classList.add('visible');
+
+            } catch (error) {
+                document.getElementById('info').innerText = 'Error: Cannot access webcam';
+                console.error('Webcam error:', error);
+                whiteTransition.classList.remove('active');
+            }
+        }
+
+        // Function to show exercise selection after camera setup
+        async function showExerciseSelection() {
+            // Fade out camera init overlay
+            const cameraInit = document.getElementById('cameraInit');
+            cameraInit.classList.remove('visible');
+
+            // Wait for fade out animation
+            await new Promise(resolve => setTimeout(resolve, 500));
+            cameraInit.style.display = 'none';
+
+            // Show exercise selection overlay
+            const exerciseSelect = document.getElementById('exerciseSelect');
+            exerciseSelect.style.display = 'flex';
+            exerciseSelect.style.opacity = '0';
+
+            // Set up hover events for knee flexion animation
+            const kneeFlexionBtn = document.querySelector('[onclick="selectExercise(\'knee_flexion\')"]');
+            if (kneeFlexionBtn) {
+                kneeFlexionBtn.addEventListener('mouseenter', startKneeAnimation);
+                kneeFlexionBtn.addEventListener('mouseleave', stopKneeAnimation);
+            }
+
+            // Set up hover events for shoulder abduction animation
+            const shoulderAbductionBtn = document.querySelector('[onclick="selectExercise(\'shoulder_abduction\')"]');
+            if (shoulderAbductionBtn) {
+                shoulderAbductionBtn.addEventListener('mouseenter', startShoulderAnimation);
+                shoulderAbductionBtn.addEventListener('mouseleave', stopShoulderAnimation);
+            }
+
+            // Trigger fade in
+            requestAnimationFrame(() => {
+                exerciseSelect.style.transition = 'opacity 0.6s ease-in-out';
+                exerciseSelect.style.opacity = '1';
+            });
+        }
+
+        // Function to handle exercise selection and start calibration
+        async function selectExercise(exerciseType) {
+            // Store selected exercise
+            sessionStorage.setItem('currentExercise', exerciseType);
+
+            // Special instructions for knee flexion
+            let instructionText = '';
+            if (exerciseType === 'knee_flexion') {
+                instructionText = 'Please sit down and turn to your side';
+            } else {
+                instructionText = 'Please stand in view of the camera';
+            }
+
+            // Hide exercise selection
+            const exerciseSelect = document.getElementById('exerciseSelect');
+            exerciseSelect.style.opacity = '0';
+            await new Promise(resolve => setTimeout(resolve, 500));
+            exerciseSelect.style.display = 'none';
+
+            // Show positioning instruction briefly if needed
+            if (instructionText) {
+                const bottomOverlay = document.getElementById('bottomOverlay');
+                const exerciseName = document.getElementById('exerciseName');
+
+                // Temporarily show instruction
+                bottomOverlay.style.display = 'grid';
+                bottomOverlay.style.opacity = '1';
+                exerciseName.textContent = instructionText.toUpperCase();
+
+                // Wait for user to get in position
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+
+            // Start calibration
+            const calibrationSuccess = await performCalibration(exerciseType);
+
+            if (calibrationSuccess) {
+                // Start countdown
+                await startCountdown();
+
+                // Start the actual exercise tracking
+                await startTracking(exerciseType);
+            } else {
+                // Allow user to try again
+                console.log('Calibration failed - user should reposition');
+                // Show exercise selection again
+                exerciseSelect.style.display = 'flex';
+                exerciseSelect.style.opacity = '1';
+            }
+        }
+
+        // Calibration function
+        async function performCalibration(exerciseType) {
+            const calibrationOverlay = document.getElementById('calibrationOverlay');
+            const calibrationStatus = document.getElementById('calibrationStatus');
+            const bottomOverlay = document.getElementById('bottomOverlay');
+            const processedFeed = document.getElementById('processedFeed');
+
+            // Temporarily stop regular frame processing to prevent lag
+            const wasProcessing = isProcessing;
+            isProcessing = false;
+
+            // IMPORTANT: Hide and clear processed feed to show live camera during calibration
+            processedFeed.style.display = 'none';
+            processedFeed.src = '';  // Clear any frozen frame
+
+            // Show calibration overlay (at top, video still visible)
+            calibrationOverlay.style.display = 'block';
+            calibrationOverlay.style.opacity = '0';
+
+            // Fade in
+            requestAnimationFrame(() => {
+                calibrationOverlay.style.transition = 'opacity 0.5s ease-in-out';
+                calibrationOverlay.style.opacity = '1';
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // Give user time to see themselves and get in position
+            calibrationStatus.innerHTML = `
+                <div class="calibration-spinner"></div>
+                <div class="calibration-message">Get in position - full body visible</div>
+            `;
+
+            // Wait 3 seconds for user to get ready
+            await new Promise(resolve => setTimeout(resolve, 3000));
+
+            // Update message
+            calibrationStatus.innerHTML = `
+                <div class="calibration-spinner"></div>
+                <div class="calibration-message">Checking position...</div>
+            `;
+
+            // Do a single check instead of multiple to prevent lag
+            let bodyDetected = false;
+
+            // Create a promise that resolves when we get a successful pose detection
+            const checkBodyDetection = new Promise((resolve) => {
+                let calibrationReceived = false;
+
+                // Set up one-time listener for the calibration check
+                const calibrationHandler = (data) => {
+                    // Only process if we haven't already received a calibration response
+                    if (calibrationReceived) return;
+
+                    console.log('Frame response received during calibration:', {
+                        hasData: !!data,
+                        hasMeasurements: !!(data && data.measurements),
+                        hasCalibrationStatus: !!(data && data.measurements && data.measurements.calibration_status),
+                        calibrationStatus: data?.measurements?.calibration_status,
+                        fullMeasurements: data?.measurements
+                    });
+
+                    // Only process frames that have calibration_status (ignore regular frames)
+                    if (data && data.measurements && data.measurements.calibration_status) {
+                        calibrationReceived = true;
+                        socket.off('frame_processed', calibrationHandler);
+
+                        if (data.measurements.calibration_status === 'success') {
+                            console.log('✓ Calibration SUCCESS! Body detected with', data.measurements.visible_landmarks, 'landmarks');
+                            resolve(true);
+                        } else {
+                            console.log('✗ Calibration failed:', data.measurements.error || 'Body not fully visible');
+                            resolve(false);
+                        }
+                    }
+                    // If no calibration_status, this is a regular frame - just ignore it
+                };
+
+                socket.on('frame_processed', calibrationHandler);
+
+                // Send just ONE frame for calibration check
+                const video = document.getElementById('webcam');
+                const canvas = document.getElementById('canvas');
+                const ctx = canvas.getContext('2d');
+
+                // Function to send calibration frame
+                const sendCalibrationFrame = () => {
+                    console.log('🎯 Attempting to send calibration frame...');
+                    console.log('Video ready state:', video.readyState, 'HAVE_ENOUGH_DATA:', video.HAVE_ENOUGH_DATA);
+
+                    if (!video || !canvas || !ctx) {
+                        console.log('❌ Video/Canvas/Context not available');
+                        resolve(false);
+                        return;
+                    }
+
+                    // Try even if video might not be fully ready
+                    try {
+                        // Use simpler resolution for reliability
+                        canvas.width = 640;
+                        canvas.height = 480;
+                        ctx.drawImage(video, 0, 0, 640, 480);
+
+                        const imageData = canvas.toDataURL('image/jpeg', 0.9);
+
+                        console.log('📸 SENDING CALIBRATION FRAME', {
+                            sessionKey: sessionKey,
+                            exerciseType: exerciseType,
+                            hasImage: !!imageData,
+                            imageLength: imageData?.length,
+                            socketConnected: socket.connected
+                        });
+
+                        socket.emit('process_frame', {
+                            session_key: sessionKey,
+                            exercise_type: exerciseType,
+                            image: imageData,
+                            is_calibration: true  // Mark as calibration to check body detection
+                        });
+                    } catch (error) {
+                        console.error('❌ Error sending calibration frame:', error);
+                        resolve(false);
+                    }
+                };
+
+                // Try sending calibration frame multiple times if needed
+                setTimeout(() => {
+                    sendCalibrationFrame();
+                }, 100);
+
+                // Retry after 500ms if no response yet
+                setTimeout(() => {
+                    if (!calibrationReceived) {
+                        console.log('🔄 Retrying calibration frame send...');
+                        sendCalibrationFrame();
+                    }
+                }, 600);
+
+                // Timeout after 3 seconds if no calibration response
+                setTimeout(() => {
+                    if (!calibrationReceived) {
+                        console.log('Calibration timeout - no response received');
+                        socket.off('frame_processed', calibrationHandler);
+                        resolve(false);
+                    }
+                }, 3000);
+            });
+
+            // Wait for body detection result
+            const calibrationSuccess = await checkBodyDetection;
+
+            // Update UI based on calibration result
+            if (calibrationSuccess) {
+                // Success feedback
+                calibrationStatus.innerHTML = `
+                    <div style="font-size: 48px;">✓</div>
+                    <div class="calibration-message calibration-success">Calibration Complete</div>
+                `;
+
+                // Play success sound
+                const successSound = document.getElementById('calibrationCompleteSound');
+                try {
+                    await successSound.play();
+                } catch (e) {
+                    console.log('Could not play calibration sound:', e);
+                }
+
+                // DON'T show static processed feed - let live tracking start immediately
+                // processedFeed.style.display = 'block';  // REMOVED - no static screenshot
+
+                // Start processing frames immediately so live feed is visible during countdown
+                isProcessing = true;
+                requestAnimationFrame(() => {
+                    processFrames();
+                });
+
+                // Brief pause just to show success message
+                await new Promise(resolve => setTimeout(resolve, 800));
+            } else {
+                // Error feedback
+                calibrationStatus.innerHTML = `
+                    <div style="font-size: 48px; color: #f87171;">✗</div>
+                    <div class="calibration-message calibration-error">Body Not Detected</div>
+                `;
+
+                // Play error sound
+                const errorSound = document.getElementById('calibrationErrorSound');
+                try {
+                    await errorSound.play();
+                } catch (e) {
+                    console.log('Could not play calibration sound:', e);
+                }
+
+                // IMPORTANT: Keep processed feed hidden on failure so user can see live camera for retry
+                processedFeed.style.display = 'none';
+                processedFeed.src = '';  // Clear any failed frame
+
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+
+            // Hide calibration overlay
+            calibrationOverlay.style.opacity = '0';
+            await new Promise(resolve => setTimeout(resolve, 500));
+            calibrationOverlay.style.display = 'none';
+
+            // Reset calibration UI for next time
+            calibrationStatus.innerHTML = `
+                <div class="calibration-spinner"></div>
+                <div class="calibration-message">Checking body detection...</div>
+            `;
+
+            // Restore processing state if it was on
+            if (wasProcessing) {
+                isProcessing = true;
+            }
+
+            return calibrationSuccess;
+        }
+
+        // Countdown function
+        async function startCountdown() {
+            const countdownOverlay = document.getElementById('countdownOverlay');
+            const countdownNumber = document.getElementById('countdownNumber');
+
+            // Show countdown overlay
+            countdownOverlay.style.display = 'flex';
+            countdownOverlay.style.opacity = '0';
+
+            // Fade in
+            requestAnimationFrame(() => {
+                countdownOverlay.style.transition = 'opacity 0.3s ease-in-out';
+                countdownOverlay.style.opacity = '1';
+            });
+
+            await new Promise(resolve => setTimeout(resolve, 300));
+
+            // Count from 3 to 1
+            for (let i = 3; i >= 1; i--) {
+                countdownNumber.textContent = i;
+                countdownNumber.style.animation = 'none';
+
+                // Force reflow to restart animation
+                void countdownNumber.offsetWidth;
+                countdownNumber.style.animation = 'countdownPulse 0.8s ease-out';
+
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+
+            // Fade out countdown
+            countdownOverlay.style.opacity = '0';
+            await new Promise(resolve => setTimeout(resolve, 300));
+            countdownOverlay.style.display = 'none';
+        }
+
+        async function startTracking(exerciseType = null) {
+            // Get exercise type from parameter or session storage
+            const currentExercise = exerciseType || sessionStorage.getItem('currentExercise') || 'shoulder_abduction';
+
+            // Initialize the bottom overlay with proper exercise name
+            const exerciseNames = {
+                'shoulder_abduction': 'SHOULDER ABDUCTION',
+                'knee_flexion': 'KNEE FLEXION',
+                'shoulder_flexion': 'SHOULDER FLEXION'
+            };
+
+            // Set exercise name immediately (no more DEMO MODE)
+            document.getElementById('exerciseName').textContent = exerciseNames[currentExercise];
+
+            // Initialize the bottom overlay with default values
+            updateBottomOverlay(0, 0, 0, 150);
+
+            // Make sure bottom overlay is visible with smooth fade
+            const bottomOverlay = document.getElementById('bottomOverlay');
+            bottomOverlay.style.display = 'grid';
+            bottomOverlay.style.opacity = '0';
+
+            // Use requestAnimationFrame for smooth transition
+            requestAnimationFrame(() => {
+                bottomOverlay.style.transition = 'opacity 0.5s ease-in-out';
+                bottomOverlay.style.opacity = '1';
+            });
+
+            // Pre-warm the video processing by doing a test frame
+            const video = document.getElementById('webcam');
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Do a test draw to warm up the pipeline
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                canvas.width = 640;
+                canvas.height = 480;
+                ctx.drawImage(video, 0, 0, 640, 480);
+            }
+
+            // Wait a bit more to ensure smooth transition
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            // Start sending frames after everything is settled
+            isProcessing = true;
+
+            // Use requestAnimationFrame to start on next frame for smoothness
+            requestAnimationFrame(() => {
+                processFrames();
+            });
+        }
+
+        let isWaitingForResponse = false;
+        let frameCount = 0;
+
+        function processFrames() {
+            if (!isProcessing) return;
+
+            const video = document.getElementById('webcam');
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Make sure video is ready
+            if (video.readyState !== video.HAVE_ENOUGH_DATA) {
+                requestAnimationFrame(() => {
+                    setTimeout(processFrames, 50);
+                });
+                return;
+            }
+
+            // Skip frame if still waiting for previous response
+            if (isWaitingForResponse) {
+                requestAnimationFrame(() => {
+                    setTimeout(processFrames, 30);
+                });
+                return;
+            }
+
+            // Skip first few frames to let things stabilize
+            frameCount++;
+            if (frameCount < 5) {
+                requestAnimationFrame(() => {
+                    setTimeout(processFrames, 100);
+                });
+                return;
+            }
+
+            // Preserve aspect ratio when resizing
+            const videoWidth = video.videoWidth;
+            const videoHeight = video.videoHeight;
+            const aspectRatio = videoWidth / videoHeight;
+
+            // Target max dimension while preserving aspect ratio
+            let targetWidth, targetHeight;
+            const maxDimension = 960; // Higher resolution for better quality
+
+            if (videoWidth > videoHeight) {
+                targetWidth = Math.min(videoWidth, maxDimension);
+                targetHeight = Math.round(targetWidth / aspectRatio);
+            } else {
+                targetHeight = Math.min(videoHeight, maxDimension);
+                targetWidth = Math.round(targetHeight * aspectRatio);
+            }
+
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+
+            // Draw with proper aspect ratio
+            ctx.clearRect(0, 0, targetWidth, targetHeight);
+            ctx.drawImage(video, 0, 0, targetWidth, targetHeight);
+
+            // Better quality for clearer image (0.85 for good balance)
+            const imageData = canvas.toDataURL('image/jpeg', 0.85);
+
+            // Send frame to backend
+            isWaitingForResponse = true;
+            const currentExercise = sessionStorage.getItem('currentExercise') || 'shoulder_abduction';
+            socket.emit('process_frame', {
+                session_key: sessionKey,
+                exercise_type: currentExercise,
+                image: imageData
+            });
+
+            // Process at 30 FPS with optimized model using requestAnimationFrame
+            requestAnimationFrame(() => {
+                setTimeout(processFrames, 33);
+            });
+        }
+
+        // Reset waiting flag when we get response
+        socket.on('frame_processed', (data) => {
+            isWaitingForResponse = false;
+
+            if (data.processed_image) {
+                const img = document.getElementById('processedFeed');
+                img.src = data.processed_image;
+                img.style.display = 'block';
+            }
+
+            if (data.measurements) {
+                if (data.measurements.error) {
+                    // Show connection status when not tracking
+                    document.getElementById('info').style.display = 'block';
+                    document.getElementById('status').innerHTML =
+                        `${data.measurements.error}`;
+                    document.getElementById('instructions').style.display = 'block';
+
+                    // Reset bottom overlay to default state when no tracking
+                    updateBottomOverlay(0, 0, 0, 150);
+                } else {
+                    // Hide the top info when tracking is active
+                    document.getElementById('info').style.display = 'none';
+
+                    // Update bottom overlay with real data
+                    const angle = data.measurements.active_angle ||
+                                 data.measurements.active_flexion || 0;
+                    const reps = data.measurements.rep_count || 0;
+                    const targetAngle = data.measurements.target_angle || 150;
+                    const progress = data.measurements.progress_percentage || 0;
+
+                    updateBottomOverlay(reps, angle, progress, targetAngle);
+                }
+            }
+        });
+
+        function updateBottomOverlay(reps, currentAngle, progress, targetAngle) {
+            // Update rep counter
+            document.querySelector('#repCounter .metric-value').textContent = `${reps}/10`;
+
+            // Update angle display
+            document.querySelector('#angleDisplay .metric-value').textContent =
+                `${Math.round(currentAngle)}°/${targetAngle}°`;
+
+            // Update progress bar
+            document.getElementById('progressFill').style.width = `${progress}%`;
+
+            // Update exercise name based on current exercise (no more DEMO MODE)
+            const exerciseNames = {
+                'shoulder_abduction': 'SHOULDER ABDUCTION',
+                'knee_flexion': 'KNEE FLEXION',
+                'shoulder_flexion': 'SHOULDER FLEXION'
+            };
+            const currentExercise = sessionStorage.getItem('currentExercise') || 'shoulder_abduction';
+
+            // Always show the actual exercise name
+            document.getElementById('exerciseName').textContent = exerciseNames[currentExercise];
+
+            // Remove pulse effect to prevent layout shifting
+        }
+
+        // Add keyboard shortcut to stop
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                isProcessing = false;
+                frameCount = 0;
+                location.reload();
+            }
+        });
+    </script>
+</body>
+</html>
