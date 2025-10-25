@@ -3,16 +3,15 @@
 // For now, using localhost for development
 
 const CONFIG = {
-  // Update this to your deployed backend URL when ready
-  // For example: 'https://kinexis-backend.onrender.com' or 'https://api.kinexis.fit'
+  // Backend API URL
   BACKEND_URL: window.location.hostname === 'localhost'
     ? 'http://localhost:5001'
-    : 'https://kinexis-backend.onrender.com', // Replace with your actual backend URL
+    : 'https://kinexis-backend.onrender.com',
 
-  // WebSocket URL (usually same as backend)
+  // WebSocket URL for real-time communication
   WS_URL: window.location.hostname === 'localhost'
     ? 'ws://localhost:5001'
-    : 'wss://kinexis-backend.onrender.com' // Replace with your actual backend URL
+    : 'wss://kinexis-backend.onrender.com'
 };
 
 // Make config globally available
