@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kinexis - Modern PT Recovery</title>
   <link rel="stylesheet" href="styles.css">
+  <script src="config.js"></script>
 
   <!-- Matching Backend Design System -->
   <style>
@@ -570,7 +571,7 @@
       </p>
 
       <div class="cta-container">
-        <a href="http://localhost:5001/demo" class="cta-primary">Start Session</a>
+        <a href="#" onclick="window.location.href = window.KINEXIS_CONFIG.BACKEND_URL + '/demo'; return false;" class="cta-primary">Start Session</a>
         <a href="instructions.html" class="cta-secondary">Learn More</a>
       </div>
 

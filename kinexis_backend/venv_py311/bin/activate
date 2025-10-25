@@ -35,7 +35,7 @@ deactivate () {
 # unset irrelevant variables
 deactivate nondestructive
 
-VIRTUAL_ENV=/Users/kentucky/Desktop/kinexis_backend/venv_py311
+VIRTUAL_ENV=/Users/kentucky/Desktop/kinexis/kinexis_backend/venv_py311
 export VIRTUAL_ENV
 
 _OLD_VIRTUAL_PATH="$PATH"
