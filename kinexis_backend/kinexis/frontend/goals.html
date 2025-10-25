@@ -2,52 +2,462 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Kinexis - Our Goals</title>
-  <link rel="stylesheet" href="styles.css">
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kinexis - Our Mission</title>
+  <link rel="icon" type="image/png" href="images/LogoWave.png">
   <style>
-.team {
-  max-width: 1000px;
-  margin: 50px auto;
-  text-align: center;
-  padding: 0 70px;
-}
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
-.team h2 {
-  font-size: 28px;
-  margin-bottom: 30px;
-}
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-.team-container {
-  display: flex;
-  justify-content: space-between; /* keeps all 4 members in a row */
-  align-items: flex-start;
-  gap: 20px;                     /* spacing between members */
-  flex-wrap: nowrap;              /* prevents wrapping on desktop */
-}
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      color: #ffffff;
+      overflow-x: hidden;
+      position: relative;
+    }
 
-.team-member {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+    /* Background animation */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+      z-index: -1;
+    }
 
-.team-member img {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%; 
-  object-fit: cover;
-  border: 3px solid #D2A10C; 
-}
+    /* Floating particles */
+    .particles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: -1;
+    }
 
-.team-member p {
-  margin-top: 10px;
-  font-weight: bold;
-}
-</style>
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      animation: float 20s infinite linear;
+    }
 
+    @keyframes float {
+      0% {
+        transform: translateY(100vh) translateX(0);
+        opacity: 0;
+      }
+      10% {
+        opacity: 1;
+      }
+      90% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-100vh) translateX(100px);
+        opacity: 0;
+      }
+    }
+
+    /* Navigation */
+    nav {
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .nav-logo {
+      height: 50px;
+      width: auto;
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 2.5rem;
+    }
+
+    nav a {
+      color: #ffffff;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      position: relative;
+      padding: 0.5rem 0;
+    }
+
+    nav a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, #D2A10C, #AA2513);
+      transition: width 0.3s ease;
+    }
+
+    nav a:hover::after {
+      width: 100%;
+    }
+
+    nav a:hover {
+      color: #D2A10C;
+    }
+
+    /* Main Content */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 4rem 2rem;
+    }
+
+    .header-section {
+      text-align: center;
+      margin-bottom: 4rem;
+      animation: fadeInDown 0.8s ease;
+    }
+
+    @keyframes fadeInDown {
+      from {
+        opacity: 0;
+        transform: translateY(-30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    h1 {
+      font-size: 3.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(90deg, #D2A10C 0%, #AA2513 50%, #D2A10C 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: gradientShift 3s ease infinite;
+      background-size: 200% 100%;
+    }
+
+    @keyframes gradientShift {
+      0% {
+        background-position: 0% 50%;
+      }
+      50% {
+        background-position: 100% 50%;
+      }
+      100% {
+        background-position: 0% 50%;
+      }
+    }
+
+    /* Mission Statement */
+    .mission-statement {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 3rem;
+      margin-bottom: 4rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      animation: fadeInUp 0.8s ease;
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .mission-text {
+      font-size: 1.3rem;
+      line-height: 1.8;
+      color: rgba(255, 255, 255, 0.95);
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .highlight {
+      color: #D2A10C;
+      font-weight: 600;
+    }
+
+    /* Values Section */
+    .values-section {
+      margin: 4rem 0;
+    }
+
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 600;
+      text-align: center;
+      margin-bottom: 3rem;
+      color: #ffffff;
+    }
+
+    .values-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-bottom: 4rem;
+    }
+
+    .value-card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      border-radius: 15px;
+      padding: 2rem;
+      text-align: center;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      transition: all 0.3s ease;
+    }
+
+    .value-card:hover {
+      transform: translateY(-5px);
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    }
+
+    .value-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      display: block;
+    }
+
+    .value-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #D2A10C;
+    }
+
+    .value-description {
+      color: rgba(255, 255, 255, 0.85);
+      line-height: 1.6;
+    }
+
+    /* Team Section */
+    .team-section {
+      margin-top: 5rem;
+    }
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 3rem;
+      margin-top: 3rem;
+    }
+
+    .team-member {
+      text-align: center;
+      animation: fadeInUp 0.8s ease;
+      animation-fill-mode: both;
+    }
+
+    .team-member:nth-child(1) {
+      animation-delay: 0.1s;
+    }
+
+    .team-member:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+
+    .team-member:nth-child(3) {
+      animation-delay: 0.3s;
+    }
+
+    .team-member:nth-child(4) {
+      animation-delay: 0.4s;
+    }
+
+    .member-image-container {
+      position: relative;
+      width: 180px;
+      height: 180px;
+      margin: 0 auto 1.5rem;
+    }
+
+    .member-image {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid rgba(210, 161, 12, 0.5);
+      transition: all 0.3s ease;
+      background: linear-gradient(135deg, rgba(102, 126, 234, 0.3), rgba(118, 75, 162, 0.3));
+    }
+
+    .member-image-placeholder {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, rgba(210, 161, 12, 0.2), rgba(170, 37, 19, 0.2));
+      border: 4px solid rgba(210, 161, 12, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.8);
+      transition: all 0.3s ease;
+    }
+
+    .team-member:hover .member-image,
+    .team-member:hover .member-image-placeholder {
+      transform: scale(1.05);
+      border-color: #D2A10C;
+      box-shadow: 0 10px 30px rgba(210, 161, 12, 0.3);
+    }
+
+    .member-name {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #ffffff;
+    }
+
+    .member-role {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 1rem;
+    }
+
+    .linkedin-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.7rem 1.5rem;
+      background: linear-gradient(135deg, #0077B5, #005885);
+      color: white;
+      text-decoration: none;
+      border-radius: 25px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      margin-top: 0.5rem;
+    }
+
+    .linkedin-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 119, 181, 0.4);
+      background: linear-gradient(135deg, #005885, #0077B5);
+    }
+
+    .linkedin-icon {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* CTA Section */
+    .cta-section {
+      text-align: center;
+      margin-top: 5rem;
+      padding: 3rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 20px;
+      backdrop-filter: blur(10px);
+    }
+
+    .cta-title {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+      font-weight: 600;
+    }
+
+    .cta-button {
+      display: inline-block;
+      padding: 1.2rem 3rem;
+      background: linear-gradient(135deg, #D2A10C 0%, #AA2513 100%);
+      color: white;
+      text-decoration: none;
+      font-size: 1.2rem;
+      font-weight: 600;
+      border-radius: 50px;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 30px rgba(210, 161, 12, 0.3);
+    }
+
+    .cta-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 15px 40px rgba(210, 161, 12, 0.4);
+      background: linear-gradient(135deg, #AA2513 0%, #D2A10C 100%);
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      nav {
+        padding: 1rem 1.5rem;
+      }
+
+      nav ul {
+        gap: 1.5rem;
+      }
+
+      nav a {
+        font-size: 0.95rem;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+      }
+
+      .mission-text {
+        font-size: 1.1rem;
+      }
+
+      .team-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+      }
+
+      .member-image,
+      .member-image-placeholder {
+        width: 150px;
+        height: 150px;
+      }
+
+      .member-image-container {
+        width: 150px;
+        height: 150px;
+      }
+    }
+  </style>
 </head>
 <body>
+  <!-- Floating particles effect -->
+  <div class="particles">
+    <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+    <div class="particle" style="left: 30%; animation-delay: 2s;"></div>
+    <div class="particle" style="left: 50%; animation-delay: 4s;"></div>
+    <div class="particle" style="left: 70%; animation-delay: 6s;"></div>
+    <div class="particle" style="left: 90%; animation-delay: 8s;"></div>
+  </div>
+
   <nav>
     <div class="logo">
       <img src="images/LogoWave.png" alt="Kinexis Logo" class="nav-logo">
@@ -59,41 +469,119 @@
     </ul>
   </nav>
 
-<main>
-  <h1>Our Mission</h1>
-  <p style="
-      max-width: 800px;   /* limits width */
-      margin: 0 auto;     /* centers block horizontally */
-      padding: 0 20px;    /* adds left/right padding */
-      text-align: left;   /* aligns text to the left inside the block */
-      line-height: 1.6;   /* optional: makes paragraphs easier to read */
-  ">
-    At <span style="color: #AA2513;">Kinexis</span>, our mission is to revolutionize physical therapy tracking by providing real-time measurements and professional progress reports in a fast, accurate, and accessible format. Patients can perform exercises at home while clinics monitor progress remotely, generating actionable insights instantly. Our automated demo and PDF reports make rehabilitation data clear, professional, and insurance-ready—without expensive or complex motion tracking systems.
-    </p>
-
-    <!-- Meet Our Team Section -->
-  <section class="team">
-    <h2>Meet Our Team</h2>
-    <div class="team-container">
-      <div class="team-member">
-        <img src="../images/member1.jpg" alt="Team Member 1">
-        <p>Member 1</p>
-      </div>
-      <div class="team-member">
-        <img src="../images/member2.jpg" alt="Team Member 2">
-        <p>Member 2</p>
-      </div>
-      <div class="team-member">
-        <img src="../images/member3.jpg" alt="Team Member 3">
-        <p>Member 3</p>
-      </div>
-      <div class="team-member">
-        <img src="../images/member4.jpg" alt="Team Member 4">
-        <p>Member 4</p>
-      </div>
+  <div class="container">
+    <div class="header-section">
+      <h1>Our Mission</h1>
     </div>
-  </section>
 
-  </main>
+    <div class="mission-statement">
+      <p class="mission-text">
+        At <span class="highlight">Kinexis</span>, we're revolutionizing physical therapy tracking by providing
+        real-time measurements and professional progress reports in a fast, accurate, and accessible format.
+        Our platform enables patients to perform exercises at home while clinics monitor progress remotely,
+        generating actionable insights instantly. With automated demos and PDF reports, we make rehabilitation
+        data clear, professional, and insurance-ready—without expensive or complex motion tracking systems.
+      </p>
+    </div>
+
+    <section class="values-section">
+      <h2 class="section-title">Our Core Values</h2>
+      <div class="values-grid">
+        <div class="value-card">
+          <span class="value-icon">🎯</span>
+          <h3 class="value-title">Precision</h3>
+          <p class="value-description">Accurate motion tracking and rep counting for reliable progress monitoring</p>
+        </div>
+        <div class="value-card">
+          <span class="value-icon">🌐</span>
+          <h3 class="value-title">Accessibility</h3>
+          <p class="value-description">Making professional PT tracking available to everyone, anywhere</p>
+        </div>
+        <div class="value-card">
+          <span class="value-icon">⚡</span>
+          <h3 class="value-title">Innovation</h3>
+          <p class="value-description">Cutting-edge AI technology for real-time pose detection and analysis</p>
+        </div>
+        <div class="value-card">
+          <span class="value-icon">💪</span>
+          <h3 class="value-title">Empowerment</h3>
+          <p class="value-description">Helping patients take control of their recovery journey</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="team-section">
+      <h2 class="section-title">Meet Our Team</h2>
+      <div class="team-grid">
+        <div class="team-member">
+          <div class="member-image-container">
+            <div class="member-image-placeholder">TK</div>
+          </div>
+          <h3 class="member-name">Thomas Kantecki</h3>
+          <p class="member-role">Co-Founder</p>
+          <a href="https://www.linkedin.com/in/thomas-kantecki-836b39271" target="_blank" rel="noopener noreferrer" class="linkedin-link">
+            <svg class="linkedin-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+            </svg>
+            LinkedIn
+          </a>
+        </div>
+
+        <div class="team-member">
+          <div class="member-image-container">
+            <div class="member-image-placeholder">GO</div>
+          </div>
+          <h3 class="member-name">Gabriel B. Otero</h3>
+          <p class="member-role">Co-Founder</p>
+          <a href="https://www.linkedin.com/in/gabriel-b-otero" target="_blank" rel="noopener noreferrer" class="linkedin-link">
+            <svg class="linkedin-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+            </svg>
+            LinkedIn
+          </a>
+        </div>
+
+        <div class="team-member">
+          <div class="member-image-container">
+            <div class="member-image-placeholder">CF</div>
+          </div>
+          <h3 class="member-name">Cooper Fuller</h3>
+          <p class="member-role">Co-Founder</p>
+          <a href="https://www.linkedin.com/in/cooper-fuller-87859a382/" target="_blank" rel="noopener noreferrer" class="linkedin-link">
+            <svg class="linkedin-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+            </svg>
+            LinkedIn
+          </a>
+        </div>
+
+        <div class="team-member">
+          <div class="member-image-container">
+            <div class="member-image-placeholder">SM</div>
+          </div>
+          <h3 class="member-name">Sarayu Marri</h3>
+          <p class="member-role">Co-Founder</p>
+          <a href="https://www.linkedin.com/in/sarayumarri/" target="_blank" rel="noopener noreferrer" class="linkedin-link">
+            <svg class="linkedin-icon" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+            </svg>
+            LinkedIn
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <div class="cta-section">
+      <h2 class="cta-title">Ready to Transform Your PT Experience?</h2>
+      <a href="http://localhost:5001/demo" class="cta-button" id="startSessionBtn">Start Your Session</a>
+    </div>
+  </div>
+
+  <!-- Load config and handle dynamic backend URL -->
+  <script src="config.js"></script>
+  <script>
+    // Update the Start Session button with correct backend URL
+    document.getElementById('startSessionBtn').href = CONFIG.BACKEND_URL + '/demo';
+  </script>
 </body>
 </html>
