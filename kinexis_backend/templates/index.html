@@ -1022,6 +1022,362 @@
             transform: translateY(0);
         }
 
+        /* ROM Progress Bar - Wii Fit / Frutiger Aero Style */
+        #romProgressBar {
+            position: fixed;
+            left: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 500px;
+            width: 140px;
+            background: linear-gradient(180deg,
+                rgba(255, 255, 255, 0.95) 0%,
+                rgba(240, 248, 255, 0.9) 50%,
+                rgba(224, 247, 250, 0.95) 100%);
+            backdrop-filter: blur(30px) saturate(150%);
+            border-radius: 70px;
+            padding: 25px;
+            display: none;
+            z-index: 100;
+            box-shadow: 0 20px 60px rgba(0, 120, 215, 0.3),
+                       0 10px 30px rgba(255, 255, 255, 0.5),
+                       inset 0 2px 5px rgba(255, 255, 255, 0.9),
+                       inset 0 -2px 5px rgba(0, 120, 215, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+        }
+
+        #romProgressBar.active {
+            display: flex;
+            flex-direction: column;
+            animation: slideInLeft 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateY(-50%) translateX(-50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(-50%) translateX(0) scale(1);
+            }
+        }
+
+        .rom-header {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #0078d7;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+        }
+
+        .rom-bar-container {
+            flex: 1;
+            width: 100%;
+            background: linear-gradient(180deg,
+                rgba(220, 237, 250, 0.8) 0%,
+                rgba(200, 230, 245, 0.9) 100%);
+            border-radius: 50px;
+            position: relative;
+            overflow: hidden;
+            border: 3px solid rgba(255, 255, 255, 0.9);
+            box-shadow: inset 0 4px 12px rgba(0, 120, 215, 0.2),
+                       inset 0 -2px 4px rgba(255, 255, 255, 0.9);
+        }
+
+        .rom-bar-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top,
+                rgba(0, 200, 83, 0.9) 0%,
+                rgba(46, 213, 115, 0.9) 30%,
+                rgba(129, 236, 236, 0.9) 70%,
+                rgba(116, 185, 255, 0.9) 100%);
+            border-radius: 47px;
+            transition: height 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 -4px 20px rgba(46, 213, 115, 0.6),
+                       inset 0 3px 6px rgba(255, 255, 255, 0.5),
+                       inset 0 -2px 4px rgba(0, 150, 60, 0.3);
+            animation: shimmer 3s infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.95; }
+        }
+
+        .rom-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(180deg,
+                rgba(255, 255, 255, 0.4) 0%,
+                rgba(255, 255, 255, 0) 50%);
+            border-radius: 47px;
+        }
+
+        .rom-markers {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            right: 0;
+        }
+
+        .rom-marker {
+            position: absolute;
+            left: -5px;
+            right: -5px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.5);
+            font-size: 12px;
+            font-weight: 500;
+            color: #0078d7;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 150px;
+            text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+        }
+
+        .rom-marker.reached {
+            background: rgba(46, 213, 115, 1);
+            height: 3px;
+            color: #00c853;
+            font-weight: 600;
+            box-shadow: 0 0 15px rgba(46, 213, 115, 0.8);
+            animation: pulse 1s;
+        }
+
+        @keyframes pulse {
+            0% { transform: scaleX(1); }
+            50% { transform: scaleX(1.05); }
+            100% { transform: scaleX(1); }
+        }
+
+        .rom-marker.target {
+            background: linear-gradient(90deg,
+                transparent 0%,
+                rgba(255, 107, 107, 1) 20%,
+                rgba(255, 107, 107, 1) 80%,
+                transparent 100%);
+            height: 4px;
+            color: #ff6b6b;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.6);
+            z-index: 10;
+        }
+
+        .rom-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 36px;
+            font-weight: 700;
+            color: #0078d7;
+            text-shadow: 0 2px 4px rgba(255, 255, 255, 0.9),
+                        0 0 20px rgba(0, 120, 215, 0.3);
+        }
+
+        .rom-instruction {
+            position: fixed;
+            left: 210px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: linear-gradient(135deg,
+                rgba(255, 255, 255, 0.98) 0%,
+                rgba(240, 248, 255, 0.95) 100%);
+            backdrop-filter: blur(30px) saturate(150%);
+            padding: 30px 40px;
+            border-radius: 40px;
+            color: #0078d7;
+            font-size: 24px;
+            font-weight: 500;
+            display: none;
+            max-width: 500px;
+            min-width: 400px;
+            border: 3px solid rgba(255, 255, 255, 0.9);
+            box-shadow: 0 20px 60px rgba(0, 120, 215, 0.2),
+                       0 10px 30px rgba(255, 255, 255, 0.5),
+                       inset 0 2px 5px rgba(255, 255, 255, 0.9);
+            letter-spacing: 0.3px;
+        }
+
+        .rom-instruction.active {
+            display: block;
+            animation: instructionSlideIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes instructionSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50%) translateX(-30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(-50%) translateX(0) scale(1);
+            }
+        }
+
+        .rom-instruction .instruction-icon {
+            font-size: 56px;
+            margin-bottom: 20px;
+            text-align: center;
+            filter: drop-shadow(0 4px 8px rgba(0, 120, 215, 0.3));
+        }
+
+        .rom-instruction.positioning {
+            border-color: rgba(116, 185, 255, 0.8);
+            background: linear-gradient(135deg,
+                rgba(250, 252, 255, 0.98) 0%,
+                rgba(240, 248, 255, 0.95) 100%);
+            color: #2563eb;
+        }
+
+        .rom-instruction.testing {
+            border-color: rgba(46, 213, 115, 0.8);
+            background: linear-gradient(135deg,
+                rgba(248, 255, 252, 0.98) 0%,
+                rgba(240, 255, 244, 0.95) 100%);
+            color: #059669;
+        }
+
+        .rom-instruction.complete {
+            border-color: rgba(129, 236, 236, 0.8);
+            background: linear-gradient(135deg,
+                rgba(240, 255, 255, 0.98) 0%,
+                rgba(224, 247, 250, 0.95) 100%);
+            color: #0891b2;
+        }
+
+        #instructionDetail {
+            font-size: 18px;
+            margin-top: 15px;
+            font-weight: 400;
+            color: currentColor;
+            opacity: 0.85;
+            line-height: 1.6;
+        }
+
+        .arm-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 25px;
+            margin-top: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            box-shadow: 0 2px 8px rgba(0, 120, 215, 0.1);
+        }
+
+        .arm-indicator.right {
+            background: linear-gradient(90deg,
+                rgba(116, 185, 255, 0.3) 0%,
+                rgba(116, 185, 255, 0.1) 100%);
+        }
+
+        .arm-indicator.left {
+            background: linear-gradient(90deg,
+                rgba(46, 213, 115, 0.3) 0%,
+                rgba(46, 213, 115, 0.1) 100%);
+        }
+
+        /* Assessment Report Modal */
+        #assessmentReport {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .report-content {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .report-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+            background: linear-gradient(90deg, #D2A10C, #AA2513);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .report-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .report-metric {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .report-metric-label {
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 5px;
+        }
+
+        .report-metric-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .report-rating {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .report-close {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(90deg, #D2A10C, #AA2513);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .report-close:hover {
+            transform: translateY(-2px);
+        }
+
         /* Bottom overlay bar - Transparent glassmorphism style */
         #bottomOverlay {
             position: fixed !important;
@@ -1388,9 +1744,54 @@
         </div>
     </div>
 
+    <!-- ROM Progress Bar - Modern Design -->
+    <div id="romProgressBar">
+        <div class="rom-header">RANGE OF MOTION</div>
+        <div class="rom-bar-container">
+            <div class="rom-bar-fill" id="romBarFill" style="height: 0%"></div>
+            <div class="rom-markers">
+                <div class="rom-marker" id="marker-10" style="bottom: 5.5%;">10°</div>
+                <div class="rom-marker" id="marker-20" style="bottom: 11%;">20°</div>
+                <div class="rom-marker" id="marker-30" style="bottom: 16.5%;">30°</div>
+                <div class="rom-marker" id="marker-40" style="bottom: 22%;">40°</div>
+                <div class="rom-marker" id="marker-50" style="bottom: 27.5%;">50°</div>
+                <div class="rom-marker" id="marker-60" style="bottom: 33%;">60°</div>
+                <div class="rom-marker" id="marker-70" style="bottom: 38.5%;">70°</div>
+                <div class="rom-marker" id="marker-80" style="bottom: 44%;">80°</div>
+                <div class="rom-marker" id="marker-90" style="bottom: 50%;">90°</div>
+                <div class="rom-marker" id="marker-100" style="bottom: 55.5%;">100°</div>
+                <div class="rom-marker" id="marker-110" style="bottom: 61%;">110°</div>
+                <div class="rom-marker" id="marker-120" style="bottom: 66.5%;">120°</div>
+                <div class="rom-marker" id="marker-130" style="bottom: 72%;">130°</div>
+                <div class="rom-marker" id="marker-140" style="bottom: 77.5%;">140°</div>
+                <div class="rom-marker target" id="marker-150" style="bottom: 83%;">TARGET</div>
+                <div class="rom-marker" id="marker-160" style="bottom: 88.5%;">160°</div>
+                <div class="rom-marker" id="marker-170" style="bottom: 94%;">170°</div>
+            </div>
+        </div>
+        <div class="rom-footer" id="currentAngleDisplay">0°</div>
+    </div>
+
+    <div class="rom-instruction" id="romInstruction">
+        <div class="instruction-icon" id="instructionIcon"></div>
+        <div id="instructionText"></div>
+        <div id="instructionDetail"></div>
+    </div>
+
+    <!-- Assessment Report Modal -->
+    <div id="assessmentReport">
+        <div class="report-content">
+            <h2 class="report-title">PT Assessment Complete</h2>
+            <div class="report-metrics" id="reportMetrics"></div>
+            <div class="report-rating" id="reportRating"></div>
+            <button class="report-close" onclick="closeReport()">Close Report</button>
+        </div>
+    </div>
+
     <!-- Audio elements for calibration sounds -->
     <audio id="calibrationCompleteSound" src="/static/audio/calibration_complete.wav" preload="auto"></audio>
     <audio id="calibrationErrorSound" src="/static/audio/calibration_error.wav" preload="auto"></audio>
+    <audio id="progbarSound" src="/static/audio/progbar.wav" preload="auto"></audio>
 
     <script>
         const socket = io('http://localhost:5001');
@@ -1607,6 +2008,11 @@
         async function selectExercise(exerciseType) {
             // Store selected exercise
             sessionStorage.setItem('currentExercise', exerciseType);
+
+            // Reset ROM display for shoulder abduction
+            if (exerciseType === 'shoulder_abduction') {
+                resetROMDisplay();
+            }
 
             // Special instructions for knee flexion
             let instructionText = '';
@@ -1912,6 +2318,53 @@
             // Get exercise type from parameter or session storage
             const currentExercise = exerciseType || sessionStorage.getItem('currentExercise') || 'shoulder_abduction';
 
+            // Show ROM bar and starting position instruction for shoulder abduction
+            if (currentExercise === 'shoulder_abduction') {
+                // Show ROM progress bar immediately
+                document.getElementById('romProgressBar').classList.add('active');
+
+                // Show starting position instruction with specific arm guidance
+                const instruction = document.getElementById('romInstruction');
+                const instructionText = document.getElementById('instructionText');
+                const instructionDetail = document.getElementById('instructionDetail');
+                const instructionIcon = document.getElementById('instructionIcon');
+
+                instruction.className = 'rom-instruction active positioning';
+                instructionIcon.textContent = '🧍';
+                instructionText.innerHTML = 'Starting Position';
+                instructionDetail.innerHTML = `
+                    <div>Stand up straight, feet shoulder-width apart</div>
+                    <div class="arm-indicator right" style="margin-top: 12px;">
+                        <span>➡️</span> RIGHT ARM: Keep at your side, palm facing your leg
+                    </div>
+                    <div style="margin-top: 10px; font-size: 16px; opacity: 0.7;">Ready in 3 seconds...</div>
+                `;
+
+                // Wait for positioning
+                await new Promise(resolve => setTimeout(resolve, 3000));
+
+                // Update instruction to begin exercise with specific arm movement
+                instruction.className = 'rom-instruction active testing';
+                instructionIcon.textContent = '💪';
+                instructionText.innerHTML = 'Raise Your Right Arm';
+                instructionDetail.innerHTML = `
+                    <div style="font-weight: 600; margin-bottom: 10px;">Movement Instructions:</div>
+                    <div>1️⃣ Keep your arm straight</div>
+                    <div>2️⃣ Raise it OUT TO THE SIDE (not forward)</div>
+                    <div>3️⃣ Go slowly and smoothly to 150°</div>
+                    <div class="arm-indicator right" style="margin-top: 12px;">
+                        <span>🎯</span> Target: 150° (shoulder height and above)
+                    </div>
+                `;
+            }
+
+            // Emit start_exercise event to reset backend assessment
+            socket.emit('start_exercise', {
+                session_id: sessionKey,
+                exercise_type: currentExercise
+            });
+            console.log('🚀 Started exercise:', currentExercise);
+
             // Initialize the bottom overlay with proper exercise name
             const exerciseNames = {
                 'shoulder_abduction': 'SHOULDER ABDUCTION',
@@ -1960,7 +2413,6 @@
             });
         }
 
-        let isWaitingForResponse = false;
         let frameCount = 0;
 
         function processFrames() {
@@ -1978,13 +2430,7 @@
                 return;
             }
 
-            // Skip frame if still waiting for previous response
-            if (isWaitingForResponse) {
-                requestAnimationFrame(() => {
-                    setTimeout(processFrames, 30);
-                });
-                return;
-            }
+            // Don't skip frames - process continuously for smooth tracking
 
             // Skip first few frames to let things stabilize
             frameCount++;
@@ -2023,7 +2469,6 @@
             const imageData = canvas.toDataURL('image/jpeg', 0.85);
 
             // Send frame to backend
-            isWaitingForResponse = true;
             const currentExercise = sessionStorage.getItem('currentExercise') || 'shoulder_abduction';
             socket.emit('process_frame', {
                 session_key: sessionKey,
@@ -2037,9 +2482,11 @@
             });
         }
 
-        // Reset waiting flag when we get response
+        // Track last increment to avoid duplicate sounds
+        let lastIncrementPlayed = 0;
+
+        // Handle processed frames
         socket.on('frame_processed', (data) => {
-            isWaitingForResponse = false;
 
             if (data.processed_image) {
                 const img = document.getElementById('processedFeed');
@@ -2061,14 +2508,132 @@
                     // Hide the top info when tracking is active
                     document.getElementById('info').style.display = 'none';
 
-                    // Update bottom overlay with real data
-                    const angle = data.measurements.active_angle ||
-                                 data.measurements.active_flexion || 0;
-                    const reps = data.measurements.rep_count || 0;
-                    const targetAngle = data.measurements.target_angle || 150;
-                    const progress = data.measurements.progress_percentage || 0;
+                    const currentExercise = sessionStorage.getItem('currentExercise');
 
-                    updateBottomOverlay(reps, angle, progress, targetAngle);
+                    // Check if this is shoulder abduction (always show ROM bar)
+                    if (currentExercise === 'shoulder_abduction') {
+                        // Show ROM bar for shoulder abduction
+                        document.getElementById('romProgressBar').classList.add('active');
+
+                        // Update ROM bar
+                        const angle = data.measurements.active_angle || 0;
+                        const romPercentage = Math.min(100, (angle / 180) * 100);
+                        document.getElementById('romBarFill').style.height = `${romPercentage}%`;
+
+                        // Update current angle display
+                        document.getElementById('currentAngleDisplay').textContent = `${Math.round(angle)}°`;
+
+                        // Update instruction with better visuals
+                        if (data.measurements.instruction || data.measurements.assessment_state) {
+                            const instruction = document.getElementById('romInstruction');
+                            const instructionText = document.getElementById('instructionText');
+                            const instructionDetail = document.getElementById('instructionDetail');
+                            const instructionIcon = document.getElementById('instructionIcon');
+
+                            // Show instruction
+                            instruction.classList.add('active');
+
+                            // Display dynamic instructions from backend
+                            if (data.measurements.instruction) {
+                                const angle = data.measurements.active_angle || 0;
+
+                                // Parse instruction to extract key parts
+                                const instText = data.measurements.instruction;
+
+                                // Update main instruction based on angle ranges
+                                if (angle < 45) {
+                                    instruction.className = 'rom-instruction active positioning';
+                                    instructionIcon.textContent = '🧍';
+                                    instructionText.innerHTML = 'Starting Position';
+                                } else if (angle < 90) {
+                                    instruction.className = 'rom-instruction active testing';
+                                    instructionIcon.textContent = '💪';
+                                    instructionText.innerHTML = 'Raising to Shoulder';
+                                } else if (angle < 150) {
+                                    instruction.className = 'rom-instruction active testing';
+                                    instructionIcon.textContent = '🎯';
+                                    instructionText.innerHTML = 'Above Shoulder';
+                                } else {
+                                    instruction.className = 'rom-instruction active complete';
+                                    instructionIcon.textContent = '✨';
+                                    instructionText.innerHTML = 'Target Reached!';
+                                }
+
+                                // Display detailed instruction with formatting
+                                if (instText.includes('RIGHT ARM:')) {
+                                    instructionDetail.innerHTML = `
+                                        <div class="arm-indicator right">
+                                            <span>➡️</span> ${instText}
+                                        </div>
+                                        <div style="margin-top: 8px; font-size: 16px; opacity: 0.8;">
+                                            Current: ${Math.round(angle)}° / Target: 150°
+                                        </div>
+                                    `;
+                                } else {
+                                    instructionDetail.innerHTML = `
+                                        <div>${instText}</div>
+                                        <div style="margin-top: 8px; font-size: 16px; opacity: 0.8;">
+                                            Progress: ${Math.round(angle)}° / 150°
+                                        </div>
+                                    `;
+                                }
+                            } else {
+                                // Fallback if no instruction from backend
+                                instruction.className = 'rom-instruction active testing';
+                                instructionIcon.textContent = '💪';
+                                instructionText.innerHTML = 'Shoulder Abduction';
+                                instructionDetail.innerHTML = 'Raise your right arm out to the side';
+                            }
+
+                            // Handle complete state
+                            if (data.measurements.assessment_state === 'complete') {
+                                instruction.className = 'rom-instruction active complete';
+                                instructionIcon.textContent = '🎉';
+                                instructionText.innerHTML = 'Assessment Complete!';
+                                instructionDetail.innerHTML = 'Great job! See your results below.';
+                            }
+                        }
+
+                        // Highlight reached markers
+                        if (data.measurements.increment_reached) {
+                            const markerId = `marker-${data.measurements.increment_reached}`;
+                            const marker = document.getElementById(markerId);
+                            if (marker && !marker.classList.contains('reached')) {
+                                marker.classList.add('reached');
+
+                                // Play sound for increments
+                                if (data.measurements.increment_reached > lastIncrementPlayed) {
+                                    lastIncrementPlayed = data.measurements.increment_reached;
+                                    const progbarSound = document.getElementById('progbarSound');
+                                    progbarSound.currentTime = 0;
+                                    progbarSound.play().catch(e => console.log('Audio play failed:', e));
+                                }
+                            }
+                        }
+
+                        // Show report when assessment is complete
+                        if (data.measurements.report) {
+                            showAssessmentReport(data.measurements.report);
+                        }
+
+                        // Update bottom overlay with angle info
+                        const targetAngle = data.measurements.target_angle || 150;
+                        const progress = data.measurements.progress_percentage || 0;
+                        updateBottomOverlay(0, angle, progress, targetAngle);
+                    } else {
+                        // Regular exercise tracking (not PT assessment)
+                        document.getElementById('romProgressBar').classList.remove('active');
+                        document.getElementById('romInstruction').classList.remove('active');
+
+                        // Update bottom overlay with real data
+                        const angle = data.measurements.active_angle ||
+                                     data.measurements.active_flexion || 0;
+                        const reps = data.measurements.rep_count || 0;
+                        const targetAngle = data.measurements.target_angle || 150;
+                        const progress = data.measurements.progress_percentage || 0;
+
+                        updateBottomOverlay(reps, angle, progress, targetAngle);
+                    }
                 }
             }
         });
@@ -2096,6 +2661,83 @@
             document.getElementById('exerciseName').textContent = exerciseNames[currentExercise];
 
             // Remove pulse effect to prevent layout shifting
+        }
+
+        // Show assessment report
+        function showAssessmentReport(report) {
+            const reportModal = document.getElementById('assessmentReport');
+            const metricsContainer = document.getElementById('reportMetrics');
+            const ratingContainer = document.getElementById('reportRating');
+
+            // Clear previous content
+            metricsContainer.innerHTML = '';
+
+            // Add metrics
+            const metrics = [
+                { label: 'Max Angle', value: `${report.max_angle}°` },
+                { label: 'Range of Motion', value: `${report.range_of_motion}°` },
+                { label: 'Average Angle', value: `${report.average_angle}°` },
+                { label: 'Test Duration', value: `${report.test_duration}s` }
+            ];
+
+            metrics.forEach(metric => {
+                const metricDiv = document.createElement('div');
+                metricDiv.className = 'report-metric';
+                metricDiv.innerHTML = `
+                    <div class="report-metric-label">${metric.label}</div>
+                    <div class="report-metric-value">${metric.value}</div>
+                `;
+                metricsContainer.appendChild(metricDiv);
+            });
+
+            // Add increments achieved
+            if (report.increments_achieved && report.increments_achieved.length > 0) {
+                const incrementsDiv = document.createElement('div');
+                incrementsDiv.className = 'report-metric';
+                incrementsDiv.style.gridColumn = 'span 2';
+                incrementsDiv.innerHTML = `
+                    <div class="report-metric-label">Increments Achieved</div>
+                    <div class="report-metric-value">${report.increments_achieved.join('°, ')}°</div>
+                `;
+                metricsContainer.appendChild(incrementsDiv);
+            }
+
+            // Add performance rating
+            ratingContainer.innerHTML = `
+                <h3 style="margin: 0 0 10px 0; color: #D2A10C;">Performance Rating</h3>
+                <p style="margin: 0; font-size: 18px;">${report.performance_rating}</p>
+            `;
+
+            // Show modal
+            reportModal.style.display = 'flex';
+        }
+
+        // Close assessment report
+        function closeReport() {
+            document.getElementById('assessmentReport').style.display = 'none';
+            // Reset assessment for next test
+            lastIncrementPlayed = 0;
+
+            // Reset all ROM markers
+            const markers = document.querySelectorAll('.rom-marker');
+            markers.forEach(marker => {
+                marker.classList.remove('reached');
+            });
+
+            // Reset angle display
+            document.getElementById('currentAngleDisplay').textContent = '0°';
+            document.getElementById('romBarFill').style.height = '0%';
+        }
+
+        // Reset ROM markers when starting new assessment
+        function resetROMDisplay() {
+            const markers = document.querySelectorAll('.rom-marker');
+            markers.forEach(marker => {
+                marker.classList.remove('reached');
+            });
+            lastIncrementPlayed = 0;
+            document.getElementById('currentAngleDisplay').textContent = '0°';
+            document.getElementById('romBarFill').style.height = '0%';
         }
 
         // Add keyboard shortcut to stop

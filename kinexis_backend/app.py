@@ -268,6 +268,11 @@ def handle_start_exercise(data):
     # Reset pose detector for new exercise
     pose_detector.reset_exercise_counters(exercise_type)
 
+    # Reset assessment for shoulder abduction
+    if exercise_type == 'shoulder_abduction':
+        pose_detector.reset_assessment()
+        print(f"🔄 Reset PT assessment for {exercise_type}")
+
     emit('exercise_started', {
         'session_id': session_id,
         'exercise_type': exercise_type,
@@ -302,12 +307,23 @@ def handle_process_frame(data):
         else:
             print(f"Received frame: shape={frame.shape}, dtype={frame.dtype}, mean={np.mean(frame):.1f}, calibration={is_calibration}")
 
+        # Reset assessment on first shoulder abduction frame (ensure initialization)
+        if exercise_type == 'shoulder_abduction' and not is_calibration:
+            if not hasattr(pose_detector, '_assessment_initialized'):
+                pose_detector.reset_assessment()
+                pose_detector._assessment_initialized = True
+                print("🎯 Initialized PT assessment for shoulder abduction")
+
         # Process frame with pose detector (no flip needed - handled in CSS)
         annotated_frame, measurements = pose_detector.process_frame(frame, exercise_type, is_calibration=is_calibration)
 
         # Log calibration results
         if is_calibration:
             print(f"📊 Calibration result: {measurements}")
+
+        # Debug: Log what we're sending for shoulder abduction
+        if exercise_type == 'shoulder_abduction' and not is_calibration:
+            print(f"📍 Shoulder Abduction Measurements: assessment_state={measurements.get('assessment_state')}, angle={measurements.get('active_angle')}, instruction={measurements.get('instruction')}")
 
         # Update session data if active
         if session_key in active_sessions:
@@ -393,6 +409,9 @@ def internal_error(error):
     return jsonify({'error': 'Internal server error'}), 500
 
 if __name__ == '__main__':
+    # Get port from environment variable or use default
+    port = int(os.environ.get('PORT', 5001))
+
     print("=" * 50)
     print("Kinexis Backend Server")
     print("=" * 50)
@@ -401,8 +420,8 @@ if __name__ == '__main__':
     print("- Knee Flexion")
     print("- Shoulder Flexion")
     print("=" * 50)
-    print("Starting server on http://localhost:5001")
-    print("WebSocket available on ws://localhost:5001")
+    print(f"Starting server on http://localhost:{port}")
+    print(f"WebSocket available on ws://localhost:{port}")
     print("=" * 50)
 
-    socketio.run(app, debug=True, host='0.0.0.0', port=5001, allow_unsafe_werkzeug=True)
+    socketio.run(app, debug=True, host='0.0.0.0', port=port, allow_unsafe_werkzeug=True)
