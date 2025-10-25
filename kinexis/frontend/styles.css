@@ -46,8 +46,9 @@ nav {
 }
 
 .nav-logo {
-  height: 50px;        /* adjust as needed */
-  width: auto;          /* maintains aspect ratio */
+    width: auto;       /* keep natural width */
+    height: 40px;      /* bigger than before, adjust as needed */
+    max-height: 60px;  /* optional cap to prevent overflow */
 }
 
 nav ul { 
