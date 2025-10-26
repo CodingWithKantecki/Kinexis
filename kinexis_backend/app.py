@@ -151,6 +151,11 @@ def serve_images(filename):
     """Serve image files"""
     return send_file(f'kinexis/frontend/images/{filename}')
 
+@app.route('/config.js')
+def serve_config():
+    """Serve config.js file"""
+    return send_file('kinexis/frontend/config.js')
+
 @app.route('/api/patients', methods=['GET', 'POST'])
 def handle_patients():
     """Get all patients or create a new patient"""
