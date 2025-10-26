@@ -74,14 +74,26 @@
 
     /* Navigation */
     nav {
-      padding: 1.5rem 3rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
+      position: relative;
+      z-index: 10;
+      padding: 15px 48px;
       background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(10px);
       border-bottom: 1px solid rgba(0, 0, 0, 0.1);
       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    nav .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
     }
 
     .nav-logo {
@@ -93,7 +105,7 @@
     nav ul {
       display: flex;
       list-style: none;
-      gap: 2.5rem;
+      gap: 40px;
     }
 
     nav a {
@@ -375,11 +387,11 @@
     /* Responsive Design */
     @media (max-width: 768px) {
       nav {
-        padding: 1rem 1.5rem;
+        padding: 20px 24px;
       }
 
       nav ul {
-        gap: 1.5rem;
+        display: none;
       }
 
       nav a {
@@ -416,14 +428,16 @@
   </div>
 
   <nav>
-    <div class="logo">
-      <img src="images/LogoWave.png" alt="Kinexis Logo" class="nav-logo">
+    <div class="container">
+      <div class="logo">
+        <img src="images/LogoWave.png" alt="Kinexis Logo" class="nav-logo">
+      </div>
+      <ul>
+        <li><a href="homepage.html">Home</a></li>
+        <li><a href="instructions.html">Instructions</a></li>
+        <li><a href="goals.html">Our Mission</a></li>
+      </ul>
     </div>
-    <ul>
-      <li><a href="homepage.html">Home</a></li>
-      <li><a href="instructions.html">Instructions</a></li>
-      <li><a href="goals.html">Our Mission</a></li>
-    </ul>
   </nav>
 
   <div class="container">

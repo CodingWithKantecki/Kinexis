@@ -31,48 +31,50 @@ body.homepage {
     "ELXP" 0;
 }
 
-nav { 
- background-color: #272932; /* solid dark brown */
+/* Navigation styles commented out - using inline styles from homepage.html instead */
+/*
+nav {
+ background-color: #272932;
   display: flex;
-  justify-content: space-between; /* logo left, tabs right */
+  justify-content: space-between;
   align-items: center;
-  padding: 5px 40px;        /* adjust height and spacing */
-  position: sticky;          /* keeps navbar at top while scrolling */
+  padding: 5px 40px;
+  position: sticky;
   top: 0;
-  z-index: 10;               /* stays above content */
+  z-index: 10;
   width: 100%;
-  box-sizing: border-box; /* ensures padding counts inside width */
-  overflow-x: hidden; /* prevents hanging off edges */
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
 .nav-logo {
-    width: auto;       /* keep natural width */
-    height: 40px;      /* bigger than before, adjust as needed */
-    max-height: 60px;  /* optional cap to prevent overflow */
+    width: auto;
+    height: 40px;
+    max-height: 60px;
 }
 
-nav ul { 
-  list-style: none; 
-  display: flex; 
-  gap: 1em; 
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 1em;
   margin: 0;
 }
 
-nav a { 
-  color: #AA2513; /* <-- your tab text color */
+nav a {
+  color: #AA2513;
   text-decoration: none;
   font-weight: bold;
   font-size: 18px;
   padding: 8px 16px;
   border-radius: 8px;
   transition: background-color 0.3s ease, color 0.3s ease;
-}  
+}
 
-/* Hover effect (optional but nice) */
 nav a:hover {
   background-color: #AA2513;
-  color: #D2A10C; /* makes text white on hover */
+  color: #D2A10C;
 }
+*/
 
 main { 
   text-align: center; 
