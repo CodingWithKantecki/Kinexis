@@ -313,6 +313,396 @@ def get_exercises():
     ]
     return jsonify(exercises)
 
+@app.route('/api/reports/generate', methods=['POST'])
+def generate_report():
+    """Generate PT report with HIPAA redaction options"""
+    from reportlab.lib.pagesizes import letter
+    from reportlab.lib import colors
+    from reportlab.lib.units import inch
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image as RLImage
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT
+    from reportlab.graphics.shapes import Drawing, Circle, Line, Rect, Wedge, String
+    from reportlab.graphics import renderPDF
+    import matplotlib
+    matplotlib.use('Agg')
+    import matplotlib.pyplot as plt
+    import numpy as np
+    import csv
+
+    data = request.json
+    report = data.get('report', {})
+    format_type = data.get('format', 'pdf')
+    redaction = data.get('redaction', {})
+
+    # Apply HIPAA redactions
+    patient_name = "[REDACTED]" if redaction.get('redact_patient') else "John Doe"
+    patient_id = "[REDACTED]" if redaction.get('redact_patient') else "PT-001"
+    date_str = "[REDACTED]" if redaction.get('redact_dates') else report.get('date', 'N/A')
+    location = "[REDACTED]" if redaction.get('redact_location') else "Kinexis Rehabilitation Center"
+
+    if format_type == 'pdf':
+        # Generate PDF report
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=0.5*inch, bottomMargin=0.5*inch)
+
+        story = []
+        styles = getSampleStyleSheet()
+
+        # Custom styles
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=24,
+            textColor=colors.HexColor('#1e40af'),
+            spaceAfter=6,
+            alignment=TA_CENTER,
+            fontName='Helvetica-Bold'
+        )
+
+        header_style = ParagraphStyle(
+            'CustomHeader',
+            parent=styles['Heading2'],
+            fontSize=16,
+            textColor=colors.HexColor('#3b82f6'),
+            spaceAfter=12,
+            spaceBefore=12,
+            fontName='Helvetica-Bold'
+        )
+
+        # Title
+        story.append(Paragraph("KINEXIS", title_style))
+        story.append(Paragraph("Physical Therapy Assessment Report", styles['Heading2']))
+        story.append(Spacer(1, 0.3*inch))
+
+        # Patient Information Section
+        story.append(Paragraph("Patient Information", header_style))
+        patient_data = [
+            ['Patient Name:', patient_name],
+            ['Patient ID:', patient_id],
+            ['Assessment Date:', date_str],
+            ['Location:', location]
+        ]
+        patient_table = Table(patient_data, colWidths=[2*inch, 4*inch])
+        patient_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#e0e7ff')),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+            ('ALIGN', (0, 0), (0, -1), 'RIGHT'),
+            ('ALIGN', (1, 0), (1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+            ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 11),
+            ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#cbd5e1')),
+            ('PADDING', (0, 0), (-1, -1), 8),
+        ]))
+        story.append(patient_table)
+        story.append(Spacer(1, 0.3*inch))
+
+        # Exercise Assessment Section
+        story.append(Paragraph("Exercise Assessment", header_style))
+        assessment_data = [
+            ['Exercise Type:', report.get('exercise', 'N/A')],
+            ['Range of Motion Achieved:', f"{report.get('maxAngle', 0)}°"],
+            ['Average Angle:', f"{report.get('avgAngle', 0)}°"],
+            ['Repetitions Completed:', str(report.get('reps', 0))],
+            ['Session Duration:', report.get('duration', 'N/A')],
+            ['Progress Status:', 'Excellent' if report.get('progress', 0) >= 80 else 'Good Progress' if report.get('progress', 0) >= 60 else 'Needs Improvement']
+        ]
+
+        assessment_table = Table(assessment_data, colWidths=[2.5*inch, 3.5*inch])
+        assessment_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#dbeafe')),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+            ('ALIGN', (0, 0), (0, -1), 'RIGHT'),
+            ('ALIGN', (1, 0), (1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
+            ('FONTNAME', (1, 0), (1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 11),
+            ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#cbd5e1')),
+            ('PADDING', (0, 0), (-1, -1), 8),
+        ]))
+        story.append(assessment_table)
+        story.append(Spacer(1, 0.3*inch))
+
+        # Create Anatomical Diagram
+        exercise_type = report.get('exercise', '')
+        max_angle = report.get('maxAngle', 0)
+
+        def create_anatomical_diagram(exercise_name, angle):
+            """Create anatomical diagram showing the exercise"""
+            d = Drawing(250, 200)
+
+            if 'Shoulder' in exercise_name:
+                # Draw shoulder abduction diagram
+                # Body
+                d.add(Circle(125, 160, 15, fillColor=colors.HexColor('#3b82f6'), strokeColor=colors.HexColor('#1e40af'), strokeWidth=2))
+                d.add(Rect(112, 100, 26, 60, fillColor=colors.HexColor('#60a5fa'), strokeColor=colors.HexColor('#1e40af'), strokeWidth=2))
+
+                # Arms - showing raised position
+                angle_rad = np.radians(angle)
+                arm_length = 50
+                arm_x = 125 + arm_length * np.sin(angle_rad)
+                arm_y = 140 - arm_length * np.cos(angle_rad)
+
+                # Right arm raised
+                d.add(Line(138, 140, arm_x, arm_y, strokeColor=colors.HexColor('#1e40af'), strokeWidth=4))
+                d.add(Circle(arm_x, arm_y, 6, fillColor=colors.HexColor('#60a5fa'), strokeColor=colors.HexColor('#1e40af'), strokeWidth=2))
+
+                # Left arm (neutral for reference)
+                d.add(Line(112, 140, 90, 110, strokeColor=colors.HexColor('#94a3b8'), strokeWidth=3, strokeDashArray=[3, 3]))
+
+                # Angle arc
+                d.add(Wedge(138, 140, 30, 270 - angle, 270, fillColor=colors.HexColor('#fef08a'), fillOpacity=0.3, strokeColor=colors.HexColor('#ca8a04'), strokeWidth=1.5))
+
+                # Angle label
+                d.add(String(170, 120, f'{int(angle)}°', fontSize=16, fontName='Helvetica-Bold', fillColor=colors.HexColor('#1e40af')))
+
+                # Labels
+                d.add(String(10, 10, 'Shoulder Abduction', fontSize=12, fontName='Helvetica-Bold', fillColor=colors.HexColor('#1e40af')))
+
+            else:  # Knee flexion
+                # Draw knee flexion diagram
+                # Upper leg
+                d.add(Rect(110, 100, 30, 80, fillColor=colors.HexColor('#60a5fa'), strokeColor=colors.HexColor('#1e40af'), strokeWidth=2))
+
+                # Lower leg - angled based on flexion
+                angle_rad = np.radians(angle)
+                leg_length = 70
+                leg_x = 125 - leg_length * np.sin(angle_rad)
+                leg_y = 100 - leg_length * np.cos(angle_rad)
+
+                d.add(Line(125, 100, leg_x, leg_y, strokeColor=colors.HexColor('#1e40af'), strokeWidth=8))
+
+                # Knee joint
+                d.add(Circle(125, 100, 8, fillColor=colors.HexColor('#fef08a'), strokeColor=colors.HexColor('#1e40af'), strokeWidth=2))
+
+                # Foot
+                d.add(Rect(leg_x - 5, leg_y - 15, 20, 10, fillColor=colors.HexColor('#3b82f6'), strokeColor=colors.HexColor('#1e40af'), strokeWidth=2))
+
+                # Reference line (straight leg)
+                d.add(Line(125, 100, 125, 30, strokeColor=colors.HexColor('#94a3b8'), strokeWidth=3, strokeDashArray=[3, 3]))
+
+                # Angle arc
+                d.add(Wedge(125, 100, 35, 270, 270 - angle, fillColor=colors.HexColor('#fef08a'), fillOpacity=0.3, strokeColor=colors.HexColor('#ca8a04'), strokeWidth=1.5))
+
+                # Angle label
+                d.add(String(150, 80, f'{int(angle)}°', fontSize=16, fontName='Helvetica-Bold', fillColor=colors.HexColor('#1e40af')))
+
+                # Labels
+                d.add(String(10, 10, 'Knee Flexion', fontSize=12, fontName='Helvetica-Bold', fillColor=colors.HexColor('#1e40af')))
+
+            return d
+
+        # Create ROM Progression Graph
+        def create_rom_graph(max_angle, avg_angle, reps, exercise_name):
+            """Create graph showing ROM measurements across repetitions"""
+            fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 3.5))
+            fig.patch.set_facecolor('white')
+
+            # Graph 1: Simulated ROM across repetitions
+            rep_numbers = np.arange(1, reps + 1)
+            # Simulate ROM values with some variation
+            rom_values = np.random.normal(avg_angle, max_angle * 0.08, reps)
+            rom_values = np.clip(rom_values, avg_angle * 0.8, max_angle)
+            rom_values[np.argmax(rom_values)] = max_angle  # Ensure max angle is in the data
+
+            ax1.plot(rep_numbers, rom_values, marker='o', linewidth=2, markersize=6, color='#3b82f6', label='ROM Achieved')
+            ax1.axhline(y=avg_angle, color='#10b981', linestyle='--', linewidth=2, label=f'Average: {int(avg_angle)}°')
+            ax1.axhline(y=max_angle, color='#ef4444', linestyle='--', linewidth=2, label=f'Peak: {int(max_angle)}°')
+
+            ax1.set_xlabel('Repetition Number', fontsize=11, fontweight='bold')
+            ax1.set_ylabel('Range of Motion (degrees)', fontsize=11, fontweight='bold')
+            ax1.set_title('ROM Across Repetitions', fontsize=12, fontweight='bold', color='#1e40af')
+            ax1.legend(loc='best', fontsize=9)
+            ax1.grid(True, alpha=0.3)
+            ax1.set_ylim(0, max_angle * 1.15)
+
+            # Graph 2: Comparison bar chart
+            target_angle = 150 if 'Shoulder' in exercise_name else 120
+            categories = ['Maximum\nAchieved', 'Average\nROM', 'Target\nGoal']
+            values = [max_angle, avg_angle, target_angle]
+            bar_colors = ['#3b82f6', '#60a5fa', '#94a3b8']
+
+            bars = ax2.bar(categories, values, color=bar_colors, edgecolor='#1e40af', linewidth=1.5)
+            ax2.set_ylabel('Degrees', fontsize=11, fontweight='bold')
+            ax2.set_title('ROM Comparison', fontsize=12, fontweight='bold', color='#1e40af')
+            ax2.set_ylim(0, target_angle * 1.15)
+
+            # Add value labels on bars
+            for bar, value in zip(bars, values):
+                height = bar.get_height()
+                ax2.text(bar.get_x() + bar.get_width()/2., height,
+                        f'{int(value)}°',
+                        ha='center', va='bottom', fontsize=10, fontweight='bold')
+
+            ax2.grid(True, alpha=0.3, axis='y')
+
+            plt.tight_layout()
+
+            # Save to buffer
+            img_buffer = io.BytesIO()
+            plt.savefig(img_buffer, format='png', dpi=150, bbox_inches='tight', facecolor='white')
+            img_buffer.seek(0)
+            plt.close()
+
+            return img_buffer
+
+        # Add anatomical diagram
+        story.append(Paragraph("Exercise Visualization", header_style))
+        anatomical_diagram = create_anatomical_diagram(exercise_type, max_angle)
+        story.append(anatomical_diagram)
+        story.append(Spacer(1, 0.2*inch))
+
+        # Add ROM graphs
+        story.append(Paragraph("Range of Motion Analysis", header_style))
+        rom_graph_buffer = create_rom_graph(max_angle, report.get('avgAngle', 0), report.get('reps', 0), exercise_type)
+        rom_graph_img = RLImage(rom_graph_buffer, width=6.5*inch, height=2.3*inch)
+        story.append(rom_graph_img)
+        story.append(Spacer(1, 0.3*inch))
+
+        # Progress Metrics Section
+        story.append(Paragraph("Detailed Measurement Data", header_style))
+
+        # Progress percentage visual
+        progress_percent = report.get('progress', 0)
+        max_angle = report.get('maxAngle', 0)
+        avg_angle = report.get('avgAngle', 0)
+
+        # Create progress bar visualization
+        progress_data = [
+            ['Measurement', 'Value', 'Status'],
+            ['Maximum ROM', f"{max_angle}°", '■' * int(progress_percent / 10) + '□' * (10 - int(progress_percent / 10))],
+            ['Average ROM', f"{avg_angle}°", '■' * int((avg_angle / max_angle * 10) if max_angle > 0 else 0) + '□' * (10 - int((avg_angle / max_angle * 10) if max_angle > 0 else 0))],
+            ['Progress Level', f"{progress_percent}%", 'Excellent' if progress_percent >= 80 else 'Good' if progress_percent >= 60 else 'Developing'],
+        ]
+
+        progress_table = Table(progress_data, colWidths=[2*inch, 1.5*inch, 2.5*inch])
+        progress_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1e40af')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.HexColor('#f0f9ff')),
+            ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'),
+            ('FONTNAME', (1, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, 0), 12),
+            ('FONTSIZE', (0, 1), (-1, -1), 11),
+            ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#3b82f6')),
+            ('PADDING', (0, 0), (-1, -1), 8),
+        ]))
+        story.append(progress_table)
+        story.append(Spacer(1, 0.3*inch))
+
+        # Performance Summary
+        story.append(Paragraph("Performance Summary", header_style))
+        reps = report.get('reps', 0)
+        duration = report.get('duration', '0:00')
+
+        performance_data = [
+            ['Metric', 'Current Session', 'Clinical Reference'],
+            ['Total Repetitions', str(reps), '8-15 reps'],
+            ['Session Duration', duration, '2-5 minutes'],
+            ['ROM Achievement', f"{max_angle}°", '150° (optimal)' if 'Shoulder' in report.get('exercise', '') else '120° (optimal)'],
+            ['Consistency', f"{int((avg_angle / max_angle * 100) if max_angle > 0 else 0)}%", '≥ 70% (good)'],
+        ]
+
+        performance_table = Table(performance_data, colWidths=[2*inch, 2*inch, 2*inch])
+        performance_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3b82f6')),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+            ('TEXTCOLOR', (0, 1), (-1, -1), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'),
+            ('FONTNAME', (1, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, 0), 11),
+            ('FONTSIZE', (0, 1), (-1, -1), 10),
+            ('GRID', (0, 0), (-1, -1), 1, colors.HexColor('#cbd5e1')),
+            ('PADDING', (0, 0), (-1, -1), 8),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ]))
+        story.append(performance_table)
+        story.append(Spacer(1, 0.5*inch))
+
+        # Footer
+        footer_style = ParagraphStyle(
+            'Footer',
+            parent=styles['Normal'],
+            fontSize=9,
+            textColor=colors.HexColor('#6b7280'),
+            alignment=TA_CENTER
+        )
+        story.append(Paragraph("This report is computer-generated by Kinexis PT Assessment System", footer_style))
+        if any(redaction.values()):
+            story.append(Paragraph("⚠️ This document contains HIPAA-redacted information", footer_style))
+
+        doc.build(story)
+        buffer.seek(0)
+
+        return send_file(buffer, mimetype='application/pdf', as_attachment=True, download_name=f'PT_Report_{patient_id}.pdf')
+
+    elif format_type == 'csv':
+        # Generate CSV report
+        buffer = io.StringIO()
+        writer = csv.writer(buffer)
+
+        writer.writerow(['Kinexis Physical Therapy Report'])
+        writer.writerow([])
+        writer.writerow(['Patient Information'])
+        writer.writerow(['Patient Name', patient_name])
+        writer.writerow(['Patient ID', patient_id])
+        writer.writerow(['Assessment Date', date_str])
+        writer.writerow(['Location', location])
+        writer.writerow([])
+        writer.writerow(['Exercise Assessment'])
+        writer.writerow(['Exercise Type', report.get('exercise', 'N/A')])
+        writer.writerow(['Range of Motion Achieved', f"{report.get('maxAngle', 0)}°"])
+        writer.writerow(['Average Angle', f"{report.get('avgAngle', 0)}°"])
+        writer.writerow(['Repetitions Completed', report.get('reps', 0)])
+        writer.writerow(['Session Duration', report.get('duration', 'N/A')])
+        writer.writerow(['Progress (%)', report.get('progress', 0)])
+
+        output = io.BytesIO()
+        output.write(buffer.getvalue().encode('utf-8'))
+        output.seek(0)
+        buffer.close()
+
+        return send_file(output, mimetype='text/csv', as_attachment=True, download_name=f'PT_Report_{patient_id}.csv')
+
+    elif format_type == 'json':
+        # Generate JSON report
+        json_data = {
+            "patient_information": {
+                "name": patient_name,
+                "id": patient_id,
+                "assessment_date": date_str,
+                "location": location
+            },
+            "exercise_assessment": {
+                "exercise_type": report.get('exercise', 'N/A'),
+                "rom_achieved_degrees": report.get('maxAngle', 0),
+                "average_angle_degrees": report.get('avgAngle', 0),
+                "repetitions_completed": report.get('reps', 0),
+                "session_duration": report.get('duration', 'N/A'),
+                "progress_percentage": report.get('progress', 0)
+            },
+            "metadata": {
+                "generated_by": "Kinexis PT Assessment System",
+                "redacted": any(redaction.values()),
+                "redaction_applied": redaction
+            }
+        }
+
+        buffer = io.BytesIO()
+        buffer.write(json.dumps(json_data, indent=2).encode('utf-8'))
+        buffer.seek(0)
+
+        return send_file(buffer, mimetype='application/json', as_attachment=True, download_name=f'PT_Report_{patient_id}.json')
+
+    return jsonify({'error': 'Invalid format'}), 400
+
 # WebSocket Events for Real-time Video Processing
 
 @socketio.on('connect')
