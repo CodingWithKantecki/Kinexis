@@ -16,9 +16,9 @@
 
     body {
       font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      background: linear-gradient(180deg, #f5f7fa 0%, #e1e5ea 100%);
       min-height: 100vh;
-      color: #ffffff;
+      color: #2d3748;
       overflow-x: hidden;
       position: relative;
     }
@@ -78,15 +78,16 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.95);
       backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
     }
 
     .nav-logo {
       height: 50px;
       width: auto;
-      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
     }
 
     nav ul {
@@ -96,7 +97,7 @@
     }
 
     nav a {
-      color: #ffffff;
+      color: #2d3748;
       text-decoration: none;
       font-weight: 500;
       font-size: 1.1rem;
@@ -121,7 +122,7 @@
     }
 
     nav a:hover {
-      color: #D2A10C;
+      color: #AA2513;
     }
 
     /* Main Content */
@@ -174,7 +175,7 @@
 
     .subtitle {
       font-size: 1.3rem;
-      color: rgba(255, 255, 255, 0.9);
+      color: #718096;
       font-weight: 300;
       margin-bottom: 3rem;
     }
@@ -188,11 +189,12 @@
     }
 
     .instruction-card {
-      background: rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.9);
       backdrop-filter: blur(20px);
       border-radius: 20px;
       padding: 2.5rem;
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(210, 161, 12, 0.2);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
       transition: all 0.3s ease;
       animation: fadeInUp 0.8s ease;
       animation-fill-mode: both;
@@ -276,13 +278,13 @@
       font-size: 1.5rem;
       font-weight: 600;
       margin-bottom: 1rem;
-      color: #ffffff;
+      color: #2d3748;
     }
 
     .step-description {
       font-size: 1.1rem;
       line-height: 1.6;
-      color: rgba(255, 255, 255, 0.85);
+      color: #718096;
     }
 
     .icon {
@@ -293,12 +295,12 @@
 
     /* Tips Section */
     .tips-section {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.9);
       border-radius: 20px;
       padding: 3rem;
       margin-top: 4rem;
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(10px);
+      border: 1px solid rgba(210, 161, 12, 0.2);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
     }
 
     .tips-title {
@@ -306,7 +308,7 @@
       font-weight: 600;
       margin-bottom: 2rem;
       text-align: center;
-      color: #D2A10C;
+      color: #2d3748;
     }
 
     .tips-list {
@@ -330,7 +332,7 @@
     }
 
     .tip-text {
-      color: rgba(255, 255, 255, 0.9);
+      color: #718096;
       line-height: 1.6;
     }
 
@@ -472,19 +474,19 @@
       <h2 class="tips-title">Pro Tips for Best Results</h2>
       <ul class="tips-list">
         <li class="tip-item">
-          <span class="tip-icon">💡</span>
+          <span class="tip-icon">•</span>
           <span class="tip-text">Wear form-fitting clothes in colors that contrast with your background for optimal tracking accuracy</span>
         </li>
         <li class="tip-item">
-          <span class="tip-icon">📱</span>
+          <span class="tip-icon">•</span>
           <span class="tip-text">Use a laptop or tablet for best experience - prop your device at chest height for ideal camera angle</span>
         </li>
         <li class="tip-item">
-          <span class="tip-icon">🎯</span>
+          <span class="tip-icon">•</span>
           <span class="tip-text">Start with slower movements to ensure the system accurately tracks your form before increasing speed</span>
         </li>
         <li class="tip-item">
-          <span class="tip-icon">📊</span>
+          <span class="tip-icon">•</span>
           <span class="tip-text">Complete full sessions for most accurate progress tracking and comprehensive reports</span>
         </li>
       </ul>
