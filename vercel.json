@@ -1,0 +1,11 @@
+{
+  "buildCommand": "",
+  "outputDirectory": "kinexis_backend/kinexis/frontend",
+  "framework": null,
+  "rewrites": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
