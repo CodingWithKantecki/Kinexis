@@ -156,3 +156,4 @@ reports/
 
 # MediaPipe models cache
 mediapipe_models/
+.vercel
