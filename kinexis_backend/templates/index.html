@@ -1960,6 +1960,7 @@
     <audio id="calibrationCompleteSound" src="/static/audio/calibration_complete.wav" preload="auto"></audio>
     <audio id="calibrationErrorSound" src="/static/audio/calibration_error.wav" preload="auto"></audio>
     <audio id="progbarSound" src="/static/audio/progbar.wav" preload="auto"></audio>
+    <audio id="countdownBeepSound" src="/static/audio/Countdown Beep.wav" preload="auto"></audio>
 
     <script>
         const socket = io('http://localhost:5001');
@@ -2896,6 +2897,9 @@
                             const holdCountdownElement = document.getElementById('holdCountdown');
                             const countdownNumberElement = document.getElementById('holdCountdownNumber');
 
+                            // Track last countdown second to avoid multiple beeps
+                            if (!window.lastCountdownSecond) window.lastCountdownSecond = 0;
+
                             if (data.measurements.hold_time_remaining && data.measurements.hold_time_remaining > 0) {
                                 // Show countdown timer
                                 holdCountdownElement.style.display = 'block';
@@ -2903,6 +2907,16 @@
                                 // Update countdown number
                                 const secondsRemaining = Math.ceil(data.measurements.hold_time_remaining);
                                 countdownNumberElement.textContent = secondsRemaining;
+
+                                // Play beep sound when second changes
+                                if (secondsRemaining !== window.lastCountdownSecond && secondsRemaining <= 5) {
+                                    window.lastCountdownSecond = secondsRemaining;
+                                    const countdownBeepSound = document.getElementById('countdownBeepSound');
+                                    if (countdownBeepSound) {
+                                        countdownBeepSound.currentTime = 0; // Reset to start
+                                        countdownBeepSound.play().catch(e => console.log('Countdown beep failed:', e));
+                                    }
+                                }
 
                                 // Color changes based on time remaining
                                 if (secondsRemaining <= 2) {
@@ -2939,6 +2953,8 @@
                             } else {
                                 // Hide countdown when not holding
                                 holdCountdownElement.style.display = 'none';
+                                // Reset countdown tracker for next time
+                                window.lastCountdownSecond = 0;
                             }
 
                             // Switch progress bar side based on which arm is being tested
