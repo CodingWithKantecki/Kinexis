@@ -3731,16 +3731,43 @@
             document.getElementById('bottomOverlay').style.display = 'none';
 
             // Hide ROM bar
-            document.getElementById('romProgressBar').style.display = 'none';
+            const romBar = document.getElementById('romProgressBar');
+            if (romBar) romBar.style.display = 'none';
 
-            // Show exercise selection
-            document.getElementById('exerciseSelect').style.display = 'flex';
+            // Hide webcam view
+            const webcamView = document.getElementById('webcamView');
+            if (webcamView) webcamView.style.display = 'none';
 
-            // Reset webcam display if needed
+            // Hide any countdown or instruction overlays
+            const holdCountdown = document.getElementById('holdCountdown');
+            if (holdCountdown) holdCountdown.style.display = 'none';
+
+            const armsDownFigure = document.getElementById('armsDownFigure');
+            if (armsDownFigure) armsDownFigure.style.display = 'none';
+
+            const countdownOverlay = document.getElementById('countdownOverlay');
+            if (countdownOverlay) countdownOverlay.style.display = 'none';
+
+            // Reset webcam and stop all tracks
             const webcam = document.getElementById('webcam');
             if (webcam && webcam.srcObject) {
                 webcam.srcObject.getTracks().forEach(track => track.stop());
                 webcam.srcObject = null;
+            }
+
+            // Clear canvas
+            const canvas = document.getElementById('canvas');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+
+            // Show exercise selection screen
+            document.getElementById('exerciseSelect').style.display = 'flex';
+
+            // Disconnect from server if connected
+            if (socket && socket.connected) {
+                socket.emit('stop_exercise');
             }
         }
     </script>
