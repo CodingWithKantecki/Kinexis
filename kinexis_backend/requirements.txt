@@ -7,9 +7,9 @@ gunicorn==21.2.0
 eventlet==0.33.3
 
 # MediaPipe for pose detection
-mediapipe==0.10.14
+mediapipe==0.10.21
 opencv-python-headless==4.8.1.78
-numpy==1.24.3
+numpy==1.26.4
 
 # Database
 Flask-SQLAlchemy==3.0.5
