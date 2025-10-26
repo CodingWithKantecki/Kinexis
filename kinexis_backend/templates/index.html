@@ -1887,8 +1887,6 @@
             <div style="font-size: 24px; color: #D2A10C; margin-bottom: 10px; font-weight: 600;">HOLD POSITION!</div>
             <div id="holdCountdownNumber" style="font-size: 72px; color: #4ade80; font-weight: bold;
                                              text-shadow: 0 0 20px rgba(74,222,128,0.5);">5</div>
-            <div id="maxAngleDisplay" style="font-size: 20px; color: #fff; margin-top: 10px;">Max: 0°</div>
-            <div style="font-size: 16px; color: #aaa; margin-top: 10px;">Keep your arm steady at this height</div>
         </div>
 
         <!-- Arms Down Instruction Figure -->
@@ -2897,7 +2895,6 @@
                             // Handle hold countdown display
                             const holdCountdownElement = document.getElementById('holdCountdown');
                             const countdownNumberElement = document.getElementById('holdCountdownNumber');
-                            const maxAngleDisplayElement = document.getElementById('maxAngleDisplay');
 
                             if (data.measurements.hold_time_remaining && data.measurements.hold_time_remaining > 0) {
                                 // Show countdown timer
@@ -2915,10 +2912,6 @@
                                 } else {
                                     countdownNumberElement.style.color = '#4ade80'; // Green
                                 }
-
-                                // Show current max angle
-                                const maxAngle = data.measurements.left_max || data.measurements.right_max || 0;
-                                maxAngleDisplayElement.textContent = `Max: ${Math.round(maxAngle)}°`;
 
                                 // Check if this is a new max (reset countdown)
                                 if (data.measurements.new_max_reached) {
