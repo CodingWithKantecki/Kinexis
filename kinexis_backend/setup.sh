@@ -4,17 +4,21 @@ echo "=========================================="
 echo "Kinexis Backend Setup"
 echo "=========================================="
 
-# Check if Python is installed
-if ! command -v python3 &> /dev/null; then
-    echo "Error: Python 3 is not installed"
+# Check if Python 3.11 is installed
+if ! command -v python3.11 &> /dev/null; then
+    echo "Error: Python 3.11 is not installed"
+    echo "Please install Python 3.11.1 to continue"
     exit 1
 fi
 
-echo "✓ Python 3 found"
+# Check Python version
+PYTHON_VERSION=$(python3.11 --version 2>&1 | awk '{print $2}')
+echo "✓ Found Python $PYTHON_VERSION"
+echo "Note: This project requires Python 3.11.1"
 
-# Create virtual environment
-echo "Creating virtual environment..."
-python3 -m venv venv
+# Create virtual environment with Python 3.11
+echo "Creating virtual environment with Python 3.11..."
+python3.11 -m venv venv
 
 # Activate virtual environment
 echo "Activating virtual environment..."

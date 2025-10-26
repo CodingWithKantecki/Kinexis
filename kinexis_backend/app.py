@@ -113,7 +113,7 @@ def index():
             'status': 'running',
             'service': 'Kinexis Backend',
             'version': '1.0.0',
-            'exercises': ['shoulder_abduction', 'knee_flexion', 'shoulder_flexion']
+            'exercises': ['shoulder_abduction', 'knee_flexion']
         })
 
 @app.route('/demo')
@@ -309,15 +309,6 @@ def get_exercises():
             'instructions': 'Stand holding a chair for support. Slowly bend your knee, bringing your heel toward your buttocks. Hold briefly, then lower slowly.',
             'normal_range': '0-135°',
             'post_surgery_goal': '60° → 120°'
-        },
-        {
-            'id': 'shoulder_flexion',
-            'name': 'Shoulder Flexion',
-            'description': 'Raise your arm forward and up',
-            'target_angle': 150,
-            'instructions': 'Stand straight and slowly raise your arm forward and up overhead, keeping it straight. Hold briefly at the top, then lower slowly.',
-            'normal_range': '0-180°',
-            'post_surgery_goal': '80° → 150°'
         }
     ]
     return jsonify(exercises)
@@ -494,7 +485,6 @@ if __name__ == '__main__':
     print("Supported exercises:")
     print("- Shoulder Abduction")
     print("- Knee Flexion")
-    print("- Shoulder Flexion")
     print("=" * 50)
     print(f"Starting server on http://localhost:{port}")
     print(f"WebSocket available on ws://localhost:{port}")

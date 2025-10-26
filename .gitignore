@@ -82,7 +82,7 @@ profile_default/
 ipython_config.py
 
 # pyenv
-.python-version
+# .python-version - REMOVED: We want to commit this to enforce Python 3.11.1
 
 # pipenv
 Pipfile.lock

@@ -1843,12 +1843,6 @@
                             <img src="/static/sit3.png" alt="Knee Flexion Frame 3">
                         </div>
                     </div>
-                    <div class="exercise-btn" onclick="selectExercise('shoulder_flexion')">
-                        <div class="exercise-info">
-                            <h3>Shoulder Flexion</h3>
-                            <p>Raise your arm forward and up • Standing position</p>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -2588,8 +2582,7 @@
             // Initialize the bottom overlay with proper exercise name
             const exerciseNames = {
                 'shoulder_abduction': 'SHOULDER ABDUCTION',
-                'knee_flexion': 'KNEE FLEXION',
-                'shoulder_flexion': 'SHOULDER FLEXION'
+                'knee_flexion': 'KNEE FLEXION'
             };
 
             // Set exercise name immediately (no more DEMO MODE)
@@ -3058,8 +3051,7 @@
             // Batch all DOM updates together to prevent reflows
             const exerciseNames = {
                 'shoulder_abduction': 'SHOULDER ABDUCTION',
-                'knee_flexion': 'KNEE FLEXION',
-                'shoulder_flexion': 'SHOULDER FLEXION'
+                'knee_flexion': 'KNEE FLEXION'
             };
             const currentExercise = sessionStorage.getItem('currentExercise') || 'shoulder_abduction';
 

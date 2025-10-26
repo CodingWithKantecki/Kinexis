@@ -8,12 +8,21 @@ Backend service for the Kinexis hackathon project that provides real-time pose d
 2. **Knee Flexion** - Knee bending (0-135°)
 3. **Shoulder Flexion** - Arm forward/up (0-180°)
 
+## Requirements
+
+- Python 3.11.1 (required)
+- Webcam for pose detection
+- Modern web browser
+
 ## Quick Start
 
 ### 1. Install Dependencies
 ```bash
-# Create virtual environment
-python -m venv venv
+# Ensure you're using Python 3.11.1
+python3.11 --version  # Should show Python 3.11.x
+
+# Create virtual environment with Python 3.11.1
+python3.11 -m venv venv
 
 # Activate virtual environment
 # On Mac/Linux:
@@ -27,6 +36,7 @@ pip install -r requirements.txt
 
 ### 2. Run the Backend
 ```bash
+# Make sure virtual environment is activated
 python app.py
 ```
 
