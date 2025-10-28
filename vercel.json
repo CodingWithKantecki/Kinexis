@@ -1,6 +1,6 @@
 {
   "installCommand": "echo 'No install needed for static site'",
   "buildCommand": "echo 'No build needed for static site'",
-  "outputDirectory": "kinexis_backend/kinexis/frontend",
+  "outputDirectory": "frontend",
   "framework": null
 }

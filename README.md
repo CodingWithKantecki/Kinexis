@@ -1,8 +1,9 @@
-# Kinexis - Webcam-Based PT Recovery Tracking
+# Kinexis - PT Recovery Platform
 
-Hackathon Project: October 24-26, 2025
+Physical Therapy tracking and management platform.
 
-Quick Summary
-Kinexis uses a standard webcam and computer vision to track patient movement during physical therapy exercises. It provides real-time visual feedback to patients and generates professional reports for insurance claims.
+## Frontend
+Static HTML/CSS/JS frontend deployed on Vercel.
 
-
+## Backend
+Backend system to be rebuilt.
