@@ -499,25 +499,26 @@
     .winner-badge {
       position: absolute;
       top: 120px;
-      right: 80px;
+      right: 50%;
+      transform: translateX(280px) rotate(-8deg);
       z-index: 15;
       animation: floatBadge 3s ease-in-out infinite;
     }
 
-    .winner-badge img {
+    .winner-badge svg {
       width: 280px;
       height: auto;
       filter: drop-shadow(0 10px 30px rgba(210, 161, 12, 0.4));
       transition: transform 0.3s ease;
     }
 
-    .winner-badge:hover img {
+    .winner-badge:hover svg {
       transform: scale(1.05);
     }
 
     @keyframes floatBadge {
-      0%, 100% { transform: translateY(0px); }
-      50% { transform: translateY(-15px); }
+      0%, 100% { transform: translateX(280px) rotate(-8deg) translateY(0px); }
+      50% { transform: translateX(280px) rotate(-8deg) translateY(-15px); }
     }
 
     /* Mascot spin animation */
@@ -564,12 +565,18 @@
 
     @media (max-width: 768px) {
       .winner-badge {
-        top: 100px;
-        right: 20px;
+        top: 90px;
+        right: 50%;
+        transform: translateX(50px) rotate(-8deg);
       }
 
-      .winner-badge img {
+      .winner-badge svg {
         width: 180px;
+      }
+
+      @keyframes floatBadge {
+        0%, 100% { transform: translateX(50px) rotate(-8deg) translateY(0px); }
+        50% { transform: translateX(50px) rotate(-8deg) translateY(-10px); }
       }
 
       .cta-coming-soon {
@@ -650,13 +657,29 @@
   <!-- Winner Badge -->
   <div class="winner-badge">
     <svg width="400" height="140" viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg">
-      <!-- Knight Logo -->
-      <g transform="translate(20, 20)">
-        <circle cx="40" cy="40" r="38" fill="#8B2500" opacity="0.2"/>
-        <path d="M 30 25 L 35 15 L 40 20 L 45 15 L 50 25 L 55 35 L 50 45 L 45 50 L 40 55 L 35 50 L 30 45 L 25 35 Z" fill="#AA2513"/>
-        <path d="M 35 30 L 40 25 L 45 30 L 42 35 L 38 35 Z" fill="#D2A10C"/>
-        <rect x="38" y="35" width="4" height="15" fill="#8B2500"/>
-        <circle cx="40" cy="28" r="3" fill="white"/>
+      <!-- Trophy -->
+      <g transform="translate(20, 15)">
+        <!-- Trophy base -->
+        <rect x="25" y="75" width="30" height="8" rx="2" fill="#8B6914"/>
+        <rect x="30" y="70" width="20" height="5" fill="#D2A10C"/>
+
+        <!-- Trophy stem -->
+        <rect x="35" y="50" width="10" height="20" fill="#D2A10C"/>
+
+        <!-- Trophy cup body -->
+        <path d="M 25 50 L 20 30 Q 20 20 30 20 L 50 20 Q 60 20 60 30 L 55 50 Z" fill="#F59E0B"/>
+        <ellipse cx="40" cy="50" rx="17" ry="5" fill="#D2A10C"/>
+
+        <!-- Trophy handles -->
+        <path d="M 20 35 Q 10 35 10 40 Q 10 45 20 45" fill="none" stroke="#D2A10C" stroke-width="3"/>
+        <path d="M 60 35 Q 70 35 70 40 Q 70 45 60 45" fill="none" stroke="#D2A10C" stroke-width="3"/>
+
+        <!-- Trophy shine -->
+        <ellipse cx="30" cy="28" rx="4" ry="8" fill="white" opacity="0.3"/>
+        <circle cx="35" cy="35" r="2" fill="white" opacity="0.5"/>
+
+        <!-- Star on trophy -->
+        <path d="M 40 30 L 42 36 L 48 36 L 43 40 L 45 46 L 40 42 L 35 46 L 37 40 L 32 36 L 38 36 Z" fill="#FFD700"/>
       </g>
 
       <!-- Text -->
