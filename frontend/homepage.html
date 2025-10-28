@@ -5,8 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Kinexis - Modern PT Recovery</title>
   <script src="config.js"></script>
+  <!-- Confetti library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
 
-  
+
   <!-- Matching Backend Design System -->
   <style>
     * {
@@ -492,6 +494,90 @@
         transform: translateY(0);
       }
     }
+
+    /* Winner Badge */
+    .winner-badge {
+      position: absolute;
+      top: 120px;
+      right: 80px;
+      z-index: 15;
+      animation: floatBadge 3s ease-in-out infinite;
+    }
+
+    .winner-badge img {
+      width: 280px;
+      height: auto;
+      filter: drop-shadow(0 10px 30px rgba(210, 161, 12, 0.4));
+      transition: transform 0.3s ease;
+    }
+
+    .winner-badge:hover img {
+      transform: scale(1.05);
+    }
+
+    @keyframes floatBadge {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-15px); }
+    }
+
+    /* Mascot spin animation */
+    @keyframes mascotSpin {
+      0% { transform: rotate(0deg) scale(1); }
+      50% { transform: rotate(180deg) scale(1.2); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+
+    .mascot.spinning {
+      animation: mascotSpin 1s ease-in-out !important;
+    }
+
+    /* Coming Soon Button */
+    .cta-coming-soon {
+      display: inline-block;
+      padding: 20px 60px;
+      background: linear-gradient(135deg, #D2A10C 0%, #F59E0B 50%, #AA2513 100%);
+      color: white;
+      font-size: 18px;
+      font-weight: 700;
+      text-decoration: none;
+      border-radius: 15px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 6px 25px rgba(210, 161, 12, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      cursor: pointer;
+      border: none;
+      background-size: 200% 100%;
+      animation: gradientShift 3s ease infinite;
+    }
+
+    .cta-coming-soon:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 10px 40px rgba(210, 161, 12, 0.6);
+    }
+
+    .cta-coming-soon:active {
+      transform: translateY(-1px) scale(1.02);
+    }
+
+    @media (max-width: 768px) {
+      .winner-badge {
+        top: 100px;
+        right: 20px;
+      }
+
+      .winner-badge img {
+        width: 180px;
+      }
+
+      .cta-coming-soon {
+        width: 100%;
+        padding: 18px 40px;
+        font-size: 16px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -561,6 +647,39 @@
     </div>
   </nav>
 
+  <!-- Winner Badge -->
+  <div class="winner-badge">
+    <svg width="400" height="140" viewBox="0 0 400 140" xmlns="http://www.w3.org/2000/svg">
+      <!-- Knight Logo -->
+      <g transform="translate(20, 20)">
+        <circle cx="40" cy="40" r="38" fill="#8B2500" opacity="0.2"/>
+        <path d="M 30 25 L 35 15 L 40 20 L 45 15 L 50 25 L 55 35 L 50 45 L 45 50 L 40 55 L 35 50 L 30 45 L 25 35 Z" fill="#AA2513"/>
+        <path d="M 35 30 L 40 25 L 45 30 L 42 35 L 38 35 Z" fill="#D2A10C"/>
+        <rect x="38" y="35" width="4" height="15" fill="#8B2500"/>
+        <circle cx="40" cy="28" r="3" fill="white"/>
+      </g>
+
+      <!-- Text -->
+      <text x="100" y="45" font-family="Arial, sans-serif" font-size="26" font-weight="bold" fill="#2563EB">
+        Knight Hacks VIII
+      </text>
+
+      <!-- Winner Badge -->
+      <rect x="100" y="55" width="115" height="32" rx="16" fill="#F59E0B"/>
+      <text x="157" y="77" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="white" text-anchor="middle">
+        WINNER
+      </text>
+
+      <!-- Category -->
+      <text x="230" y="77" font-family="Arial, sans-serif" font-size="20" font-weight="normal" fill="#1F2937">
+        Best App
+      </text>
+      <text x="230" y="100" font-family="Arial, sans-serif" font-size="20" font-weight="normal" fill="#1F2937">
+        Development Hack
+      </text>
+    </svg>
+  </div>
+
   <!-- Hero Section -->
   <section class="hero">
     <div class="hero-content">
@@ -573,8 +692,9 @@
       </p>
 
       <div class="cta-container">
-        <a href="#" onclick="window.location.href = window.KINEXIS_CONFIG.BACKEND_URL + '/demo'; return false;" class="cta-primary">Start Session</a>
-        <a href="instructions.html" class="cta-secondary">Learn More</a>
+        <button class="cta-coming-soon" id="comingSoonBtn">
+          Kinexis 2.0 Coming Very Soon
+        </button>
       </div>
 
       <div class="features">
@@ -649,6 +769,67 @@
       }
     }
 
+    // Confetti and mascot spin celebration
+    function celebrate() {
+      // Fire confetti with app color scheme
+      const colors = ['#D2A10C', '#F59E0B', '#AA2513', '#FFD700'];
+
+      // Multiple confetti bursts
+      const duration = 3000;
+      const animationEnd = Date.now() + duration;
+
+      const randomInRange = (min, max) => Math.random() * (max - min) + min;
+
+      const confettiInterval = setInterval(() => {
+        const timeLeft = animationEnd - Date.now();
+
+        if (timeLeft <= 0) {
+          clearInterval(confettiInterval);
+          return;
+        }
+
+        const particleCount = 50;
+
+        // Launch from left side
+        confetti({
+          particleCount,
+          angle: 60,
+          spread: 55,
+          origin: { x: 0, y: 0.6 },
+          colors: colors
+        });
+
+        // Launch from right side
+        confetti({
+          particleCount,
+          angle: 120,
+          spread: 55,
+          origin: { x: 1, y: 0.6 },
+          colors: colors
+        });
+
+        // Launch from center
+        confetti({
+          particleCount: particleCount * 1.5,
+          angle: 90,
+          spread: 100,
+          origin: { x: 0.5, y: 0.5 },
+          colors: colors
+        });
+      }, 250);
+
+      // Make mascots spin
+      const mascots = document.querySelectorAll('.mascot');
+      mascots.forEach((mascot, index) => {
+        setTimeout(() => {
+          mascot.classList.add('spinning');
+          setTimeout(() => {
+            mascot.classList.remove('spinning');
+          }, 1000);
+        }, index * 150);
+      });
+    }
+
     // Start animations when page loads
     document.addEventListener('DOMContentLoaded', () => {
       // Create animators for each mascot with different speeds
@@ -662,6 +843,12 @@
       animator2.start();
       animator3.start();
       animator4.start();
+
+      // Add click handler to coming soon button
+      const comingSoonBtn = document.getElementById('comingSoonBtn');
+      if (comingSoonBtn) {
+        comingSoonBtn.addEventListener('click', celebrate);
+      }
     });
   </script>
 </body>
